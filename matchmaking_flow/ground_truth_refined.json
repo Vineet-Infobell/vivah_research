@@ -1,0 +1,1204 @@
+[
+  {
+    "scenario_id": 1,
+    "scenario_name": "Software/IT Professional in Bangalore",
+    "query": "Looking for Software Developer or SDE with B.Tech and lives in Bangalore",
+    "searcher": {
+      "gender": "Female",
+      "age": 26,
+      "religion": "Hindu"
+    },
+    "filters": {
+      "gender": "Male",
+      "religion": "Hindu",
+      "preferred_age": 29
+    },
+    "criteria": {
+      "jobs": [
+        "SDE",
+        "Software Developer",
+        "Backend Developer",
+        "Software Engineer"
+      ],
+      "exact_jobs": [
+        "SDE",
+        "Software Developer"
+      ],
+      "educations": [
+        "B.Tech",
+        "B.E.",
+        "MCA",
+        "M.Tech"
+      ],
+      "location": "Bangalore",
+      "location_flexible": false
+    },
+    "ground_truth_candidates": [
+      {
+        "rank": 1,
+        "relevance_score": 3,
+        "user_id": 732,
+        "name": "Rahul",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 2,
+        "relevance_score": 3,
+        "user_id": 904,
+        "name": "Kartik",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.E.",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 3,
+        "relevance_score": 3,
+        "user_id": 908,
+        "name": "Abhishek",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.E.",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 4,
+        "relevance_score": 3,
+        "user_id": 901,
+        "name": "Rohan",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "SDE"
+      },
+      {
+        "rank": 5,
+        "relevance_score": 3,
+        "user_id": 906,
+        "name": "Vikram",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.E.",
+        "job_title": "SDE"
+      },
+      {
+        "rank": 6,
+        "relevance_score": 3,
+        "user_id": 916,
+        "name": "Yash",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MCA",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 7,
+        "relevance_score": 3,
+        "user_id": 794,
+        "name": "Deepak",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "M.Tech",
+        "job_title": "SDE"
+      },
+      {
+        "rank": 8,
+        "relevance_score": 3,
+        "user_id": 905,
+        "name": "Pranav",
+        "gender": "Male",
+        "age": 31,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "SDE"
+      },
+      {
+        "rank": 9,
+        "relevance_score": 3,
+        "user_id": 907,
+        "name": "Varun",
+        "gender": "Male",
+        "age": 31,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 10,
+        "relevance_score": 3,
+        "user_id": 902,
+        "name": "Ravi",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.E.",
+        "job_title": "SDE"
+      },
+      {
+        "rank": 11,
+        "relevance_score": 3,
+        "user_id": 903,
+        "name": "Karan",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 12,
+        "relevance_score": 3,
+        "user_id": 912,
+        "name": "Kartik",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MCA",
+        "job_title": "Software Developer"
+      },
+      {
+        "rank": 13,
+        "relevance_score": 2,
+        "user_id": 909,
+        "name": "Siddharth",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Backend Developer"
+      },
+      {
+        "rank": 14,
+        "relevance_score": 2,
+        "user_id": 913,
+        "name": "Rahul",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Backend Developer"
+      },
+      {
+        "rank": 15,
+        "relevance_score": 2,
+        "user_id": 245,
+        "name": "Varun",
+        "gender": "Male",
+        "age": 34,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MCA",
+        "job_title": "Software Developer"
+      }
+    ]
+  },
+  {
+    "scenario_id": 2,
+    "scenario_name": "Medical Professional (Doctor/Surgeon)",
+    "query": "Looking for Doctor or Surgeon with MBBS",
+    "searcher": {
+      "gender": "Female",
+      "age": 28,
+      "religion": "Hindu"
+    },
+    "filters": {
+      "gender": "Male",
+      "religion": "Hindu",
+      "preferred_age": 29
+    },
+    "criteria": {
+      "jobs": [
+        "Doctor",
+        "Surgeon",
+        "Physician",
+        "Medical Officer"
+      ],
+      "exact_jobs": [
+        "Doctor",
+        "Surgeon"
+      ],
+      "educations": [
+        "MBBS",
+        "MD",
+        "MS (Surgery)"
+      ],
+      "location": null,
+      "location_flexible": true
+    },
+    "ground_truth_candidates": [
+      {
+        "rank": 1,
+        "relevance_score": 3,
+        "user_id": 705,
+        "name": "Sahil",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Ahmedabad",
+        "education": "MBBS",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 2,
+        "relevance_score": 3,
+        "user_id": 853,
+        "name": "Aditya",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Chennai",
+        "education": "MBBS",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 3,
+        "relevance_score": 3,
+        "user_id": 928,
+        "name": "Mohit",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MD",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 4,
+        "relevance_score": 3,
+        "user_id": 246,
+        "name": "Vikram",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBBS",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 5,
+        "relevance_score": 3,
+        "user_id": 590,
+        "name": "Pranav",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Gurgaon",
+        "education": "MD",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 6,
+        "relevance_score": 3,
+        "user_id": 677,
+        "name": "Ravi",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MD",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 7,
+        "relevance_score": 3,
+        "user_id": 925,
+        "name": "Sanjay",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Kolkata",
+        "education": "MD",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 8,
+        "relevance_score": 3,
+        "user_id": 927,
+        "name": "Varun",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Kolkata",
+        "education": "MD",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 9,
+        "relevance_score": 3,
+        "user_id": 935,
+        "name": "Mayank",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Pune",
+        "education": "MS (Surgery)",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 10,
+        "relevance_score": 3,
+        "user_id": 936,
+        "name": "Deepak",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Gurgaon",
+        "education": "MS (Surgery)",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 11,
+        "relevance_score": 3,
+        "user_id": 256,
+        "name": "Akash",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBBS",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 12,
+        "relevance_score": 3,
+        "user_id": 922,
+        "name": "Vikram",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Pune",
+        "education": "MBBS",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 13,
+        "relevance_score": 3,
+        "user_id": 923,
+        "name": "Vivek",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Gurgaon",
+        "education": "MBBS",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 14,
+        "relevance_score": 3,
+        "user_id": 924,
+        "name": "Mayank",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Delhi",
+        "education": "MBBS",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 15,
+        "relevance_score": 3,
+        "user_id": 134,
+        "name": "Arjun",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Gurgaon",
+        "education": "MD",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 16,
+        "relevance_score": 3,
+        "user_id": 178,
+        "name": "Vivek",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Noida",
+        "education": "MS (Surgery)",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 17,
+        "relevance_score": 3,
+        "user_id": 188,
+        "name": "Abhishek",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBBS",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 18,
+        "relevance_score": 3,
+        "user_id": 407,
+        "name": "Vikram",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Noida",
+        "education": "MD",
+        "job_title": "Doctor"
+      },
+      {
+        "rank": 19,
+        "relevance_score": 3,
+        "user_id": 492,
+        "name": "Arjun",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Pune",
+        "education": "MS (Surgery)",
+        "job_title": "Surgeon"
+      },
+      {
+        "rank": 20,
+        "relevance_score": 3,
+        "user_id": 564,
+        "name": "Sahil",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MD",
+        "job_title": "Doctor"
+      }
+    ]
+  },
+  {
+    "scenario_id": 3,
+    "scenario_name": "Finance Professional in Mumbai",
+    "query": "Looking for Finance Professional (CA / Finance Manager / Analyst / Auditor) and lives in Mumbai",
+    "searcher": {
+      "gender": "Female",
+      "age": 24,
+      "religion": "Hindu"
+    },
+    "filters": {
+      "gender": "Male",
+      "religion": "Hindu",
+      "preferred_age": 27
+    },
+    "criteria": {
+      "jobs": [
+        "Chartered Accountant",
+        "Finance Manager",
+        "Financial Analyst",
+        "Auditor"
+      ],
+      "exact_jobs": [
+        "Chartered Accountant",
+        "Finance Manager"
+      ],
+      "educations": [
+        "CA",
+        "MBA",
+        "M.Com",
+        "CFA"
+      ],
+      "location": "Mumbai",
+      "location_flexible": false
+    },
+    "ground_truth_candidates": [
+      {
+        "rank": 1,
+        "relevance_score": 3,
+        "user_id": 943,
+        "name": "Pranav",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 2,
+        "relevance_score": 3,
+        "user_id": 944,
+        "name": "Arjun",
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 3,
+        "relevance_score": 3,
+        "user_id": 945,
+        "name": "Ravi",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBA",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 4,
+        "relevance_score": 3,
+        "user_id": 947,
+        "name": "Mohit",
+        "gender": "Male",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Chartered Accountant"
+      },
+      {
+        "rank": 5,
+        "relevance_score": 3,
+        "user_id": 955,
+        "name": "Rajesh",
+        "gender": "Male",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "M.Com",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 6,
+        "relevance_score": 3,
+        "user_id": 948,
+        "name": "Ishaan",
+        "gender": "Male",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Chartered Accountant"
+      },
+      {
+        "rank": 7,
+        "relevance_score": 3,
+        "user_id": 942,
+        "name": "Harsh",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Chartered Accountant"
+      },
+      {
+        "rank": 8,
+        "relevance_score": 3,
+        "user_id": 946,
+        "name": "Ankit",
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBA",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 9,
+        "relevance_score": 2,
+        "user_id": 287,
+        "name": "Rahul",
+        "gender": "Male",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 10,
+        "relevance_score": 2,
+        "user_id": 951,
+        "name": "Suresh",
+        "gender": "Male",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 11,
+        "relevance_score": 2,
+        "user_id": 956,
+        "name": "Kartik",
+        "gender": "Male",
+        "age": 31,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "M.Com",
+        "job_title": "Finance Manager"
+      },
+      {
+        "rank": 12,
+        "relevance_score": 2,
+        "user_id": 941,
+        "name": "Ishaan",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Chartered Accountant"
+      },
+      {
+        "rank": 13,
+        "relevance_score": 1,
+        "user_id": 864,
+        "name": "Aditya",
+        "gender": "Male",
+        "age": 23,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBA",
+        "job_title": "Financial Analyst"
+      },
+      {
+        "rank": 14,
+        "relevance_score": 1,
+        "user_id": 949,
+        "name": "Pranav",
+        "gender": "Male",
+        "age": 31,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBA",
+        "job_title": "Financial Analyst"
+      },
+      {
+        "rank": 15,
+        "relevance_score": 1,
+        "user_id": 952,
+        "name": "Ankit",
+        "gender": "Male",
+        "age": 31,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 16,
+        "relevance_score": 1,
+        "user_id": 457,
+        "name": "Kartik",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 17,
+        "relevance_score": 1,
+        "user_id": 653,
+        "name": "Ankit",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "M.Com",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 18,
+        "relevance_score": 1,
+        "user_id": 799,
+        "name": "Aditya",
+        "gender": "Male",
+        "age": 22,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "CA",
+        "job_title": "Auditor"
+      },
+      {
+        "rank": 19,
+        "relevance_score": 1,
+        "user_id": 950,
+        "name": "Rajesh",
+        "gender": "Male",
+        "age": 32,
+        "religion": "Hindu",
+        "location": "Mumbai",
+        "education": "MBA",
+        "job_title": "Financial Analyst"
+      }
+    ]
+  },
+  {
+    "scenario_id": 4,
+    "scenario_name": "Designer/PM in Bangalore",
+    "query": "Looking for UI/UX Designer or Product Manager with B.Tech and lives in Bangalore",
+    "searcher": {
+      "gender": "Male",
+      "age": 30,
+      "religion": "Hindu"
+    },
+    "filters": {
+      "gender": "Female",
+      "religion": "Hindu",
+      "preferred_age": 29
+    },
+    "criteria": {
+      "jobs": [
+        "UI/UX Designer",
+        "Product Manager",
+        "Product Designer"
+      ],
+      "exact_jobs": [
+        "UI/UX Designer",
+        "Product Manager"
+      ],
+      "educations": [
+        "B.Tech",
+        "B.E.",
+        "Bachelor of Design",
+        "MBA",
+        "BFA"
+      ],
+      "location": "Bangalore",
+      "location_flexible": false
+    },
+    "ground_truth_candidates": [
+      {
+        "rank": 1,
+        "relevance_score": 3,
+        "user_id": 101,
+        "name": "Meera",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MBA",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 2,
+        "relevance_score": 3,
+        "user_id": 963,
+        "name": "Diya",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 3,
+        "relevance_score": 3,
+        "user_id": 964,
+        "name": "Sakshi",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 4,
+        "relevance_score": 3,
+        "user_id": 967,
+        "name": "Kavya",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MBA",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 5,
+        "relevance_score": 3,
+        "user_id": 968,
+        "name": "Divya",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "MBA",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 6,
+        "relevance_score": 3,
+        "user_id": 973,
+        "name": "Kiara",
+        "gender": "Female",
+        "age": 29,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 7,
+        "relevance_score": 3,
+        "user_id": 961,
+        "name": "Sakshi",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 8,
+        "relevance_score": 3,
+        "user_id": 962,
+        "name": "Myra",
+        "gender": "Female",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 9,
+        "relevance_score": 3,
+        "user_id": 965,
+        "name": "Megha",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "Bachelor of Design",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 10,
+        "relevance_score": 3,
+        "user_id": 966,
+        "name": "Vanshika",
+        "gender": "Female",
+        "age": 30,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "Bachelor of Design",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 11,
+        "relevance_score": 3,
+        "user_id": 975,
+        "name": "Divya",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "BFA",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 12,
+        "relevance_score": 3,
+        "user_id": 974,
+        "name": "Divya",
+        "gender": "Female",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "B.Tech",
+        "job_title": "Product Manager"
+      },
+      {
+        "rank": 13,
+        "relevance_score": 3,
+        "user_id": 976,
+        "name": "Simran",
+        "gender": "Female",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "BFA",
+        "job_title": "UI/UX Designer"
+      },
+      {
+        "rank": 14,
+        "relevance_score": 2,
+        "user_id": 970,
+        "name": "Sakshi",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "Bachelor of Design",
+        "job_title": "Product Designer"
+      },
+      {
+        "rank": 15,
+        "relevance_score": 2,
+        "user_id": 969,
+        "name": "Aarti",
+        "gender": "Female",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Bangalore",
+        "education": "Bachelor of Design",
+        "job_title": "Product Designer"
+      }
+    ]
+  },
+  {
+    "scenario_id": 5,
+    "scenario_name": "Data Scientist in Hyderabad",
+    "query": "Looking for Data Scientist with M.Tech and lives in Hyderabad",
+    "searcher": {
+      "gender": "Male",
+      "age": 27,
+      "religion": "Hindu"
+    },
+    "filters": {
+      "gender": "Female",
+      "religion": "Hindu",
+      "preferred_age": 25
+    },
+    "criteria": {
+      "jobs": [
+        "Data Scientist",
+        "ML Engineer",
+        "AI Engineer"
+      ],
+      "exact_jobs": [
+        "Data Scientist",
+        "ML Engineer"
+      ],
+      "educations": [
+        "M.Tech",
+        "MS in CS",
+        "B.Tech"
+      ],
+      "location": "Hyderabad",
+      "location_flexible": false
+    },
+    "ground_truth_candidates": [
+      {
+        "rank": 1,
+        "relevance_score": 3,
+        "user_id": 987,
+        "name": "Aaradhya",
+        "gender": "Female",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 2,
+        "relevance_score": 3,
+        "user_id": 990,
+        "name": "Saanvi",
+        "gender": "Female",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "ML Engineer"
+      },
+      {
+        "rank": 3,
+        "relevance_score": 3,
+        "user_id": 994,
+        "name": "Pooja",
+        "gender": "Female",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "B.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 4,
+        "relevance_score": 3,
+        "user_id": 995,
+        "name": "Simran",
+        "gender": "Female",
+        "age": 25,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "ML Engineer"
+      },
+      {
+        "rank": 5,
+        "relevance_score": 3,
+        "user_id": 981,
+        "name": "Shruti",
+        "gender": "Female",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 6,
+        "relevance_score": 3,
+        "user_id": 982,
+        "name": "Swati",
+        "gender": "Female",
+        "age": 24,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 7,
+        "relevance_score": 3,
+        "user_id": 983,
+        "name": "Ishita",
+        "gender": "Female",
+        "age": 24,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 8,
+        "relevance_score": 3,
+        "user_id": 986,
+        "name": "Preeti",
+        "gender": "Female",
+        "age": 26,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 9,
+        "relevance_score": 3,
+        "user_id": 985,
+        "name": "Sakshi",
+        "gender": "Female",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 10,
+        "relevance_score": 3,
+        "user_id": 989,
+        "name": "Ishita",
+        "gender": "Female",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "M.Tech",
+        "job_title": "ML Engineer"
+      },
+      {
+        "rank": 11,
+        "relevance_score": 3,
+        "user_id": 993,
+        "name": "Simran",
+        "gender": "Female",
+        "age": 27,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "B.Tech",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 12,
+        "relevance_score": 3,
+        "user_id": 984,
+        "name": "Kavya",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 13,
+        "relevance_score": 3,
+        "user_id": 988,
+        "name": "Sakshi",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "Data Scientist"
+      },
+      {
+        "rank": 14,
+        "relevance_score": 3,
+        "user_id": 996,
+        "name": "Shruti",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "ML Engineer"
+      },
+      {
+        "rank": 15,
+        "relevance_score": 2,
+        "user_id": 991,
+        "name": "Pari",
+        "gender": "Female",
+        "age": 24,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "AI Engineer"
+      },
+      {
+        "rank": 16,
+        "relevance_score": 2,
+        "user_id": 992,
+        "name": "Preeti",
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu",
+        "location": "Hyderabad",
+        "education": "MS in CS",
+        "job_title": "AI Engineer"
+      }
+    ]
+  }
+]

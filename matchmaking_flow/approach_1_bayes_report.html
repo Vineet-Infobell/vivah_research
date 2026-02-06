@@ -1,0 +1,756 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bayesian Optimization - Detailed Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        
+        h1 { 
+            color: #2d3748; 
+            text-align: center; 
+            margin-bottom: 10px; 
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero-section h2 { 
+            font-size: 3.5em; 
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero-section p { 
+            font-size: 1.3em; 
+            opacity: 0.95; 
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card .label {
+            display: block;
+            font-size: 0.85em;
+            color: #718096;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        
+        .stat-card .value {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .stat-card .subvalue {
+            display: block;
+            font-size: 0.9em;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .param-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .param-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .param-card .param-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .param-card .param-desc {
+            color: #718096;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .param-card .param-formula {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .chart-container h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f7fafc;
+        }
+        
+        .comparison-table .winner {
+            background-color: #f0fff4;
+            border-left: 4px solid #48bb78;
+        }
+        
+        .iteration-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .iteration-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #cbd5e0;
+            display: grid;
+            grid-template-columns: 60px 1fr 120px;
+            gap: 20px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .iteration-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .iteration-item.top-3 {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 50%);
+            border-left-color: #48bb78;
+        }
+        
+        .iteration-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .iteration-params {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .iteration-params .param-line {
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .iteration-score {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: right;
+        }
+        
+        .insights-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border-left: 4px solid #fc8181;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .insights-box h3 {
+            color: #c53030;
+            margin-bottom: 15px;
+        }
+        
+        .insights-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .insights-box li {
+            padding: 10px 0;
+            color: #742a2a;
+            font-size: 1.05em;
+        }
+        
+        .insights-box li:before {
+            content: "💡 ";
+            margin-right: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-success {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-info {
+            background-color: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .badge-warning {
+            background-color: #feebc8;
+            color: #744210;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Bayesian Optimization Report</h1>
+        <div class="subtitle">Hyperparameter Tuning for Matchmaking Algorithm</div>
+        
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h2>0.9282</h2>
+            <p>Best NDCG Score Achieved (out of 1.0)</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+                Optimization completed in 1.8 seconds | 20 iterations
+            </p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Average NDCG</span>
+                <span class="value">0.8096</span>
+                <span class="subvalue">Across all iterations</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Best Iteration</span>
+                <span class="value">#16</span>
+                <span class="subvalue">Peak performance</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Improvement</span>
+                <span class="value">0.3565</span>
+                <span class="subvalue">From worst to best</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">vs Baseline</span>
+                <span class="value">+0.1979</span>
+                <span class="subvalue">Better than default</span>
+            </div>
+        </div>
+        
+        <!-- Optimal Parameters Section -->
+        <div class="section">
+            <h2 class="section-title">🏆 Optimal Parameters</h2>
+            <div class="params-grid">
+                <div class="param-card">
+                    <h3>Semantic Weight (a)</h3>
+                    <div class="param-value">95.00%</div>
+                    <div class="param-desc">
+                        Weight given to semantic similarity (job, education, location match). 
+                        Higher value means profile content matching is more important than age.
+                    </div>
+                    <div class="param-formula">
+                        Semantic Component = similarity × 0.950
+                    </div>
+                </div>
+                
+                <div class="param-card">
+                    <h3>Age Weight (b)</h3>
+                    <div class="param-value">5.00%</div>
+                    <div class="param-desc">
+                        Weight given to age proximity scoring. Automatically calculated as (100 - a).
+                        Lower value indicates age difference has less impact on final score.
+                    </div>
+                    <div class="param-formula">
+                        Age Component = age_score × 0.050
+                    </div>
+                </div>
+                
+                <div class="param-card">
+                    <h3>Older Age Decay (c)</h3>
+                    <div class="param-value">27.84%</div>
+                    <div class="param-desc">
+                        Penalty per year for candidates older than preferred age. 
+                        Formula uses exponential decay: base^years_difference
+                    </div>
+                    <div class="param-formula">
+                        Decay Base = 0.722<br>
+                        Example: 3 years older → 0.376 multiplier
+                    </div>
+                </div>
+                
+                <div class="param-card">
+                    <h3>Younger Age Decay (d)</h3>
+                    <div class="param-value">50.00%</div>
+                    <div class="param-desc">
+                        Penalty per year for candidates younger than preferred age.
+                        Typically has stronger penalty as younger partners are less preferred.
+                    </div>
+                    <div class="param-formula">
+                        Decay Base = 0.500<br>
+                        Example: 3 years younger → 0.125 multiplier
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="section">
+            <h2 class="section-title">📊 Optimization Progress</h2>
+            
+            <div class="chart-container">
+                <h3>NDCG Score Evolution</h3>
+                <canvas id="accuracyChart" height="100"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Parameter Exploration</h3>
+                <canvas id="parametersChart" height="100"></canvas>
+            </div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <div class="section">
+            <h2 class="section-title">⚖️ Baseline Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Configuration</th>
+                        <th>Semantic Weight</th>
+                        <th>Age Weight</th>
+                        <th>Older Decay</th>
+                        <th>Younger Decay</th>
+                        <th>NDCG Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="winner">
+                        <td><strong>Optimized (Bayesian)</strong> <span class="badge badge-success">WINNER</span></td>
+                        <td>95.00%</td>
+                        <td>5.00%</td>
+                        <td>27.84%</td>
+                        <td>50.00%</td>
+                        <td><strong>0.9282</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Baseline (Default)</strong></td>
+                        <td>80.00%</td>
+                        <td>20.00%</td>
+                        <td>20.00%</td>
+                        <td>40.00%</td>
+                        <td>0.7303</td>
+                    </tr>
+                    <tr style="background-color: #f0fff4;">
+                        <td><strong>Improvement</strong></td>
+                        <td>+15.00%</td>
+                        <td>-15.00%</td>
+                        <td>+7.84%</td>
+                        <td>+10.00%</td>
+                        <td><strong style="color: #48bb78;">+0.1979</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- All Iterations -->
+        <div class="section">
+            <h2 class="section-title">🔬 All Iterations (Ranked)</h2>
+            <ul class="iteration-list">
+
+                <li class="iteration-item top-3">
+                    <div class="iteration-rank">#1</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 27.84% | <strong>Younger Decay:</strong> 50.00%</div>
+                    </div>
+                    <div class="iteration-score">0.9282 <span class="badge badge-success">TOP 1</span></div>
+                </li>
+    
+                <li class="iteration-item top-3">
+                    <div class="iteration-rank">#2</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 87.46% | <strong>Age:</strong> 12.54%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 10.62% | <strong>Younger Decay:</strong> 9.09%</div>
+                    </div>
+                    <div class="iteration-score">0.9239 <span class="badge badge-success">TOP 2</span></div>
+                </li>
+    
+                <li class="iteration-item top-3">
+                    <div class="iteration-rank">#3</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 23.44% | <strong>Younger Decay:</strong> 39.10%</div>
+                    </div>
+                    <div class="iteration-score">0.9225 <span class="badge badge-success">TOP 3</span></div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#4</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 87.11% | <strong>Age:</strong> 12.89%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 11.27% | <strong>Younger Decay:</strong> 10.03%</div>
+                    </div>
+                    <div class="iteration-score">0.9113 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#5</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 16.39% | <strong>Younger Decay:</strong> 50.00%</div>
+                    </div>
+                    <div class="iteration-score">0.9089 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#6</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 36.02% | <strong>Younger Decay:</strong> 40.49%</div>
+                    </div>
+                    <div class="iteration-score">0.9070 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#7</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 76.94% | <strong>Age:</strong> 23.06%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 7.80% | <strong>Younger Decay:</strong> 7.80%</div>
+                    </div>
+                    <div class="iteration-score">0.8955 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#8</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 44.51% | <strong>Younger Decay:</strong> 50.00%</div>
+                    </div>
+                    <div class="iteration-score">0.8923 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#9</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 9.25% | <strong>Younger Decay:</strong> 10.32%</div>
+                    </div>
+                    <div class="iteration-score">0.8756 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#10</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 81.86% | <strong>Age:</strong> 18.14%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 1.03% | <strong>Younger Decay:</strong> 48.50%</div>
+                    </div>
+                    <div class="iteration-score">0.8042 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#11</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 95.00% | <strong>Age:</strong> 5.00%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 0.00% | <strong>Younger Decay:</strong> 0.00%</div>
+                    </div>
+                    <div class="iteration-score">0.7814 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#12</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 60.31% | <strong>Age:</strong> 39.69%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 0.00% | <strong>Younger Decay:</strong> 0.00%</div>
+                    </div>
+                    <div class="iteration-score">0.7814 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#13</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 86.52% | <strong>Age:</strong> 13.48%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 0.00% | <strong>Younger Decay:</strong> 17.96%</div>
+                    </div>
+                    <div class="iteration-score">0.7781 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#14</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 69.99% | <strong>Age:</strong> 30.01%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 11.61% | <strong>Younger Decay:</strong> 15.60%</div>
+                    </div>
+                    <div class="iteration-score">0.7752 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#15</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 84.26% | <strong>Age:</strong> 15.74%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 23.20% | <strong>Younger Decay:</strong> 46.68%</div>
+                    </div>
+                    <div class="iteration-score">0.7617 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#16</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 54.36% | <strong>Age:</strong> 45.64%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 0.00% | <strong>Younger Decay:</strong> 50.00%</div>
+                    </div>
+                    <div class="iteration-score">0.7501 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#17</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 81.47% | <strong>Age:</strong> 18.53%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 4.46% | <strong>Younger Decay:</strong> 0.00%</div>
+                    </div>
+                    <div class="iteration-score">0.7412 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#18</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 87.75% | <strong>Age:</strong> 12.25%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 23.37% | <strong>Younger Decay:</strong> 0.00%</div>
+                    </div>
+                    <div class="iteration-score">0.7110 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#19</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 66.85% | <strong>Age:</strong> 33.15%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 47.54% | <strong>Younger Decay:</strong> 36.60%</div>
+                    </div>
+                    <div class="iteration-score">0.5717 </div>
+                </li>
+    
+                <li class="iteration-item ">
+                    <div class="iteration-rank">#20</div>
+                    <div class="iteration-params">
+                        <div class="param-line"><strong>Semantic:</strong> 52.61% | <strong>Age:</strong> 47.39%</div>
+                        <div class="param-line"><strong>Older Decay:</strong> 43.31% | <strong>Younger Decay:</strong> 30.06%</div>
+                    </div>
+                    <div class="iteration-score">0.5717 </div>
+                </li>
+    
+            </ul>
+        </div>
+        
+        <!-- Key Insights -->
+        <div class="insights-box">
+            <h3>🔑 Key Insights</h3>
+            <ul>
+                <li><strong>Semantic Dominance:</strong> Optimal semantic weight is 95.0%, meaning job/education/location match is MUCH more important than age difference.</li>
+                <li><strong>Age Flexibility:</strong> Age weight is only 5.0%, indicating users are more flexible about age if other criteria match well.</li>
+                <li><strong>Asymmetric Age Preference:</strong> Younger candidates face 50.0% decay vs 27.8% for older ones, showing stronger penalty for being younger.</li>
+                <li><strong>Performance Gain:</strong> Bayesian optimization achieved 19.79% improvement over baseline configuration.</li>
+                <li><strong>Convergence:</strong> Best result found at iteration #16 out of 20, showing efficient optimization.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Accuracy Chart
+        const ctxAccuracy = document.getElementById('accuracyChart').getContext('2d');
+        new Chart(ctxAccuracy, {
+            type: 'line',
+            data: {
+                labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                datasets: [{
+                    label: 'NDCG Score',
+                    data: [np.float64(0.571670066244642), np.float64(0.8954617264506431), np.float64(0.571670066244642), np.float64(0.804172617415726), np.float64(0.9239435221415688), np.float64(0.7814112363608664), np.float64(0.911261585618908), np.float64(0.7109894131609843), np.float64(0.7780538355270654), np.float64(0.7814112363608664), np.float64(0.7501356000948637), np.float64(0.7412306303329232), np.float64(0.7751549799743396), np.float64(0.8756090205531019), np.float64(0.9089086818745559), np.float64(0.9281798470680691), np.float64(0.9225456359320493), np.float64(0.7616582185661985), np.float64(0.907045120868618), np.float64(0.8923371682082866)],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                },
+                {
+                    label: 'Baseline',
+                    data: Array(20).fill(0.7302516430839255),
+                    borderColor: '#fc8181',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0.521670066244642,
+                        max: 0.9481798470680691,
+                        title: { display: true, text: 'NDCG Score' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Iteration' }
+                    }
+                }
+            }
+        });
+        
+        // Parameters Chart
+        const ctxParams = document.getElementById('parametersChart').getContext('2d');
+        new Chart(ctxParams, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Semantic Weight',
+                        data: [{'x': 1, 'y': np.float64(66.8543053481313), 'r': 8}, {'x': 2, 'y': np.float64(76.93963178886665), 'r': 8}, {'x': 3, 'y': np.float64(52.613762547568975), 'r': 8}, {'x': 4, 'y': np.float64(81.86326600082205), 'r': 8}, {'x': 5, 'y': np.float64(87.45991883601897), 'r': 8}, {'x': 6, 'y': np.float64(95.0), 'r': 8}, {'x': 7, 'y': np.float64(87.1095396326119), 'r': 8}, {'x': 8, 'y': np.float64(87.74995108938099), 'r': 8}, {'x': 9, 'y': np.float64(86.52363414139407), 'r': 8}, {'x': 10, 'y': np.float64(60.305486098048284), 'r': 8}, {'x': 11, 'y': np.float64(54.35774137382724), 'r': 8}, {'x': 12, 'y': np.float64(81.46617312290107), 'r': 8}, {'x': 13, 'y': np.float64(69.99423835942002), 'r': 8}, {'x': 14, 'y': np.float64(95.0), 'r': 8}, {'x': 15, 'y': np.float64(95.0), 'r': 8}, {'x': 16, 'y': np.float64(95.0), 'r': 8}, {'x': 17, 'y': np.float64(95.0), 'r': 8}, {'x': 18, 'y': np.float64(84.25765501984385), 'r': 8}, {'x': 19, 'y': np.float64(95.0), 'r': 8}, {'x': 20, 'y': np.float64(95.0), 'r': 8}],
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)'
+                    },
+                    {
+                        label: 'Older Decay',
+                        data: [{'x': 1, 'y': np.float64(47.53571532049581), 'r': 8}, {'x': 2, 'y': np.float64(7.800932022121826), 'r': 8}, {'x': 3, 'y': np.float64(43.308807288746756), 'r': 8}, {'x': 4, 'y': np.float64(1.0292247147901223), 'r': 8}, {'x': 5, 'y': np.float64(10.616955533913808), 'r': 8}, {'x': 6, 'y': np.float64(0.0), 'r': 8}, {'x': 7, 'y': np.float64(11.268498939398805), 'r': 8}, {'x': 8, 'y': np.float64(23.370470607791216), 'r': 8}, {'x': 9, 'y': np.float64(0.0), 'r': 8}, {'x': 10, 'y': np.float64(0.0), 'r': 8}, {'x': 11, 'y': np.float64(0.0), 'r': 8}, {'x': 12, 'y': np.float64(4.460632727241155), 'r': 8}, {'x': 13, 'y': np.float64(11.611154613060762), 'r': 8}, {'x': 14, 'y': np.float64(9.250725052238188), 'r': 8}, {'x': 15, 'y': np.float64(16.38915738105511), 'r': 8}, {'x': 16, 'y': np.float64(27.84185928645086), 'r': 8}, {'x': 17, 'y': np.float64(23.43712585993571), 'r': 8}, {'x': 18, 'y': np.float64(23.19942892935661), 'r': 8}, {'x': 19, 'y': np.float64(36.019234382321855), 'r': 8}, {'x': 20, 'y': np.float64(44.50835873309963), 'r': 8}],
+                        backgroundColor: 'rgba(72, 187, 120, 0.6)'
+                    },
+                    {
+                        label: 'Younger Decay',
+                        data: [{'x': 1, 'y': np.float64(36.59969709057025), 'r': 8}, {'x': 2, 'y': np.float64(7.799726016810133), 'r': 8}, {'x': 3, 'y': np.float64(30.05575058716044), 'r': 8}, {'x': 4, 'y': np.float64(48.49549260809972), 'r': 8}, {'x': 5, 'y': np.float64(9.091248360355031), 'r': 8}, {'x': 6, 'y': np.float64(0.0), 'r': 8}, {'x': 7, 'y': np.float64(10.034139745629346), 'r': 8}, {'x': 8, 'y': np.float64(0.0), 'r': 8}, {'x': 9, 'y': np.float64(17.956244726213583), 'r': 8}, {'x': 10, 'y': np.float64(0.0), 'r': 8}, {'x': 11, 'y': np.float64(50.0), 'r': 8}, {'x': 12, 'y': np.float64(0.0), 'r': 8}, {'x': 13, 'y': np.float64(15.601912293856744), 'r': 8}, {'x': 14, 'y': np.float64(10.32292314040087), 'r': 8}, {'x': 15, 'y': np.float64(50.0), 'r': 8}, {'x': 16, 'y': np.float64(50.0), 'r': 8}, {'x': 17, 'y': np.float64(39.1014758644803), 'r': 8}, {'x': 18, 'y': np.float64(46.679798057268286), 'r': 8}, {'x': 19, 'y': np.float64(40.4913205684276), 'r': 8}, {'x': 20, 'y': np.float64(50.0), 'r': 8}],
+                        backgroundColor: 'rgba(237, 137, 54, 0.6)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: 'Parameter Value (%)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Iteration' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

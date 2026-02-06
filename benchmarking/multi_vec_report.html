@@ -1,0 +1,1334 @@
+
+    <html><head><style>
+        body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
+        .scenario-box { background: #222; margin-bottom: 20px; padding: 20px; border-radius: 8px; border: 1px solid #444; }
+        .comparison-grid { display: grid; gap: 20px; }
+        .stats { background: #333; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; line-height: 1.6; }
+        .header { display: flex; justify-content: space-between; }
+        .winner-badge { background: #444; padding: 5px 10px; border-radius: 4px; }
+        .col-title { margin-bottom: 10px; font-weight: bold; color: #888; border-bottom: 2px solid #444; }
+    </style></head><body>
+    <h1>🚀 Search Strategy Benchmark: Single vs Multi (Dimensions: 768, 1536)</h1>
+    
+        <div class="scenario-box">
+             <div class="header">
+                <h3>SDE (Prof + Edu) (768d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['SDE', 'Software Engineer']<br>Edu: ['B.Tech', 'B.E.']<br>Loc: []</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 335ms<br>🎯 0.9<br>🧭 Job:80% | Edu:80% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 415ms<br>🎯 0.9<br>🧭 Job:80% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~670ms<br>🎯 0.8<br>🧭 Job:60% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Radiologist (Prof + Loc) (768d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Radiologist']<br>Edu: []<br>Loc: ['Ahmedabad']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 1227ms<br>🎯 0.78<br>🧭 Job:80% | Edu:0% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Radhika <span style='background:#f59e0b; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>🥈 Good</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Medical Officer | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 396ms<br>🎯 0.65<br>🧭 Job:100% | Edu:0% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Divya 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Bangalore
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~2454ms<br>🎯 0.76<br>🧭 Job:40% | Edu:0% | Loc:100%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ishani 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Surgeon | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>CA (Edu + Loc) (768d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: []<br>Edu: ['CA', 'Chartered Accountant']<br>Loc: ['Delhi']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 1213ms<br>🎯 0.4<br>🧭 Job:0% | Edu:60% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 1646ms<br>🎯 0.4<br>🧭 Job:0% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~2426ms<br>🎯 0.55<br>🧭 Job:0% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Business Analyst (All 3) (768d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Business Analyst']<br>Edu: ['MBA']<br>Loc: ['Noida']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 1821ms<br>🎯 0.65<br>🧭 Job:80% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 448ms<br>🎯 0.65<br>🧭 Job:100% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~5463ms<br>🎯 0.65<br>🧭 Job:80% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Tushar 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>SDE (Prof + Edu) (1152d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['SDE', 'Software Engineer']<br>Edu: ['B.Tech', 'B.E.']<br>Loc: []</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 335ms<br>🎯 0.9<br>🧭 Job:80% | Edu:80% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 423ms<br>🎯 0.9<br>🧭 Job:80% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~671ms<br>🎯 0.8<br>🧭 Job:60% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Radiologist (Prof + Loc) (1152d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Radiologist']<br>Edu: []<br>Loc: ['Ahmedabad']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 549ms<br>🎯 0.78<br>🧭 Job:80% | Edu:0% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Radhika <span style='background:#f59e0b; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>🥈 Good</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Medical Officer | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 1141ms<br>🎯 0.65<br>🧭 Job:100% | Edu:0% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Divya 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Pune
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~1098ms<br>🎯 0.76<br>🧭 Job:40% | Edu:0% | Loc:100%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ishani 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Surgeon | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>CA (Edu + Loc) (1152d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: []<br>Edu: ['CA', 'Chartered Accountant']<br>Loc: ['Delhi']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 436ms<br>🎯 0.4<br>🧭 Job:0% | Edu:60% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 1194ms<br>🎯 0.4<br>🧭 Job:0% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~872ms<br>🎯 0.55<br>🧭 Job:0% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Business Analyst (All 3) (1152d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Business Analyst']<br>Edu: ['MBA']<br>Loc: ['Noida']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 505ms<br>🎯 0.65<br>🧭 Job:100% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 533ms<br>🎯 0.65<br>🧭 Job:100% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~1515ms<br>🎯 0.65<br>🧭 Job:80% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Tushar 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>SDE (Prof + Edu) (1536d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['SDE', 'Software Engineer']<br>Edu: ['B.Tech', 'B.E.']<br>Loc: []</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 450ms<br>🎯 0.9<br>🧭 Job:80% | Edu:80% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 521ms<br>🎯 0.9<br>🧭 Job:80% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~905ms<br>🎯 0.8<br>🧭 Job:60% | Edu:60% | Loc:0%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Nisha <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Bangalore
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Varun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Hyderabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Arjun <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            SDE | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Radiologist (Prof + Loc) (1536d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Radiologist']<br>Edu: []<br>Loc: ['Ahmedabad']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 585ms<br>🎯 0.78<br>🧭 Job:80% | Edu:0% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Radhika <span style='background:#f59e0b; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>🥈 Good</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Medical Officer | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 554ms<br>🎯 0.65<br>🧭 Job:100% | Edu:0% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Divya 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Pune
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~1170ms<br>🎯 0.76<br>🧭 Job:40% | Edu:0% | Loc:100%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Sahil <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Mohit <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Radiologist | Ahmedabad
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ishani 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Surgeon | Ahmedabad
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>CA (Edu + Loc) (1536d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Cascade 🏆 wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: []<br>Edu: ['CA', 'Chartered Accountant']<br>Loc: ['Delhi']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 387ms<br>🎯 0.4<br>🧭 Job:0% | Edu:60% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Saanvi 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Marketing Head | Delhi
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 764ms<br>🎯 0.4<br>🧭 Job:0% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~774ms<br>🎯 0.55<br>🧭 Job:0% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Amrita <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Delhi
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Aryan 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Investment Banker | Gurgaon
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Suresh 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Finance Manager | Mumbai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scenario-box">
+             <div class="header">
+                <h3>Business Analyst (All 3) (1536d)</h3>
+                <span class="winner-badge" style="background:#5D5DFF">Single wins</span>
+            </div>
+            <p style="color:#aaa; font-size:12px;">Job: ['Business Analyst']<br>Edu: ['MBA']<br>Loc: ['Noida']</p>
+            
+            <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- SINGLE -->
+                <div class="col">
+                    <div class="col-title">Single Vector</div>
+                    <div class="stats">⏱️ 394ms<br>🎯 0.65<br>🧭 Job:80% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI PARALLEL -->
+                <div class="col">
+                    <div class="col-title" style="color:#22c55e">Multi (Parallel)</div>
+                    <div class="stats">⏱️ 486ms<br>🎯 0.65<br>🧭 Job:100% | Edu:80% | Loc:40%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Vanshika 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- MULTI SEQUENTIAL -->
+                <div class="col">
+                    <div class="col-title" style="color:#f59e0b">Multi (Sequential)</div>
+                    <div class="stats">⏱️ ~1185ms<br>🎯 0.65<br>🧭 Job:80% | Edu:80% | Loc:60%</div>
+                    <div class="profiles">
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Diya <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #22c55e; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Ritesh <span style='background:#22c55e; color:black; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;'>👑 Perfect</span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Noida
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1e293b; border-left: 4px solid #334155; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
+                        <div style="font-weight: bold; color: #f8fafc; font-size: 14px;">
+                            Tushar 
+                        </div>
+                        <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
+                            Business Analyst | Chennai
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </body></html>
+    

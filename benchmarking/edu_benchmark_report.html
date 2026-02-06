@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Embedding Benchmark Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header .timestamp {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .winner-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+        }
+        
+        .winner-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .winner-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            display: block;
+            margin-top: 0.25rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+        
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-excellent {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge-good {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .badge-fair {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .badge-poor {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .query-section {
+            margin-bottom: 2rem;
+        }
+        
+        .query-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .query-header:hover {
+            background: rgba(99, 102, 241, 0.15);
+        }
+        
+        .query-header h4 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .ground-truth {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .gt-item {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: 1px solid var(--success);
+        }
+        
+        .retrieved-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .retrieved-list li {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .match-icon {
+            font-size: 1.2rem;
+        }
+        
+        .match { color: var(--success); }
+        .miss { color: var(--danger); }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+        
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .model-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .model-card h5 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .collapse-btn.open {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.open {
+            max-height: 2000px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Education Embedding Benchmark Report</h1>
+            <p class="timestamp">Generated: 2026-01-23 15:11:28 IST</p>
+        </div>
+        
+        <div class="winner-card">
+            <h2>🥇 Overall Winner</h2>
+            <p style="font-size: 1.3rem; margin: 0.5rem 0;">Text-Embed-005 (768) + Cosine</p>
+            <div class="winner-stats">
+                <div class="stat">
+                    <span class="stat-value">0.9287</span>
+                    <span class="stat-label">nDCG</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">1.0000</span>
+                    <span class="stat-label">MRR</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">0.9231</span>
+                    <span class="stat-label">Precision@5</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">0.7015</span>
+                    <span class="stat-label">Recall@5</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('summary')">📊 Summary</button>
+            <button class="tab" onclick="showTab('queries')">🔍 Per-Query Analysis</button>
+            <button class="tab" onclick="showTab('analysis')">🔬 Deep Analysis</button>
+            <button class="tab" onclick="showTab('full')">📋 Full Results</button>
+        </div>
+        
+        <div id="summary" class="tab-content active">
+            <div class="card">
+                <h3>📈 Performance by Dimension</h3>
+                <div class="chart-container">
+                    <canvas id="dimensionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🎯 Distance Metric Comparison</h3>
+                <div class="chart-container">
+                    <canvas id="distanceChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🏅 Top 5 Configurations</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Model</th>
+                            <th>Distance</th>
+                            <th>nDCG</th>
+                            <th>MRR</th>
+                            <th>Precision@5</th>
+                            <th>Recall@5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>🥇</td>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td>🥈</td>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>L2</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td>🥉</td>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td>#4</td>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>L1</td>
+                            <td><span class="badge badge-excellent">0.9053</span></td>
+                            <td>1.0000</td>
+                            <td>0.8923</td>
+                            <td>0.6804</td>
+                        </tr>
+
+                        <tr>
+                            <td>#5</td>
+                            <td><strong>Text-Embed-004 (768)</strong></td>
+                            <td>L1</td>
+                            <td><span class="badge badge-good">0.8510</span></td>
+                            <td>1.0000</td>
+                            <td>0.8022</td>
+                            <td>0.6155</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="queries" class="tab-content">
+
+            <div class="query-section">
+                <div class="query-header" onclick="toggleCollapse('Computer_Science_Graduate')">
+                    <h4>Query: "Computer Science Graduate"</h4>
+                    <button class="collapse-btn" id="btn_Computer_Science_Graduate">▼</button>
+                </div>
+                <div class="collapsible-content" id="content_Computer_Science_Graduate">
+                    <div class="card">
+                        <p><strong>Ground Truth (Tiered by Relevance):</strong></p>
+                        <div class="ground-truth">
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">B.Tech Computer Science</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">B.E. Computer Science</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">B.Sc Computer Science</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">MCA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">M.Tech Computer Science</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">B.Tech Information Technology</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">BCA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">Diploma in Computer Science</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.Tech Electronics</span>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">🏆 Top 3 Performers</h4>
+                        <div class="model-comparison">
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Cosine</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8910</span> | Score: 12.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Sc Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. Diploma in Computer Science <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. B.Tech Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Tech Computer Science <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. B.E. Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L2</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8910</span> | Score: 12.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Sc Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. Diploma in Computer Science <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. B.Tech Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Tech Computer Science <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. B.E. Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Inner_Product</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8910</span> | Score: 12.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Sc Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. Diploma in Computer Science <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. B.Tech Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Tech Computer Science <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. B.E. Computer Science <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">📊 All Configurations</h4>
+                        <table id="table_Computer_Science_Graduate" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>Distance</th>
+                                    <th>nDCG</th>
+                                    <th>Score</th>
+                                    <th>Retrieved Top-5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>🥇</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8910</span></td>
+                                    <td>12.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. Diploma in Computer Science <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥈</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8910</span></td>
+                                    <td>12.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. Diploma in Computer Science <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥉</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8910</span></td>
+                                    <td>12.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. Diploma in Computer Science <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#4</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8786</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#5</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8786</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#6</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8786</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#7</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8163</span></td>
+                                    <td>10.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. Diploma in Computer Science <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#8</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7659</span></td>
+                                    <td>9.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Tech Computer Science <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#9</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.4301</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#10</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.4301</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.Tech Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#11</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.4301</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#12</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.4301</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.E. Computer Science <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#13</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#14</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#15</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#16</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#17</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#18</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#19</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#20</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#21</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#22</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#23</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#24</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.3337</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--danger);">✗</span> 1. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 2. CS <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Tech Computer Science <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Sc Computer Science <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Diploma in Computer Science <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <div class="query-header" onclick="toggleCollapse('Doctor')">
+                    <h4>Query: "Doctor"</h4>
+                    <button class="collapse-btn" id="btn_Doctor">▼</button>
+                </div>
+                <div class="collapsible-content" id="content_Doctor">
+                    <div class="card">
+                        <p><strong>Ground Truth (Tiered by Relevance):</strong></p>
+                        <div class="ground-truth">
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MBBS</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MD General Medicine</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MS General Surgery</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">BDS</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">BAMS</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">BHMS</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.Pharma</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">Physiotherapy (BPT)</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.Sc Nursing</span>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">🏆 Top 3 Performers</h4>
+                        <div class="model-comparison">
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Cosine</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9036</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MD General Medicine <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBBS <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. MS General Surgery <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. BDS <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon miss">✗</span> 5. Ph.D. Physics <small style="opacity:0.7">(0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L2</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9036</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MD General Medicine <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBBS <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. MS General Surgery <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. BDS <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon miss">✗</span> 5. Ph.D. Physics <small style="opacity:0.7">(0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Inner_Product</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9036</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MD General Medicine <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBBS <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. MS General Surgery <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. BDS <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon miss">✗</span> 5. Ph.D. Physics <small style="opacity:0.7">(0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">📊 All Configurations</h4>
+                        <table id="table_Doctor" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>Distance</th>
+                                    <th>nDCG</th>
+                                    <th>Score</th>
+                                    <th>Retrieved Top-5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>🥇</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-excellent">0.9036</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MS General Surgery <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BDS <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Ph.D. Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥈</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-excellent">0.9036</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MS General Surgery <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BDS <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Ph.D. Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥉</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9036</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MS General Surgery <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BDS <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Ph.D. Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#4</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8613</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 4. BDS <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. MS General Surgery <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#5</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7704</span></td>
+                                    <td>9.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 4. MS General Surgery <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. M.Sc Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#6</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7540</span></td>
+                                    <td>9.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.Sc Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. MS General Surgery <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#7</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7540</span></td>
+                                    <td>9.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.Sc Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. MS General Surgery <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#8</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7540</span></td>
+                                    <td>9.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.Sc Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. MS General Surgery <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#9</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#10</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#11</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#12</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#13</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#14</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7059</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#15</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.6569</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 2. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. BHMS <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#16</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#17</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#18</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#19</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#20</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#21</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#22</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-poor">0.6095</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#23</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.5605</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 2. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#24</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.5605</span></td>
+                                    <td>6.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MD General Medicine <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 2. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBBS <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Computer Science <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. D.Ed <small>(0pts)</small><br></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <div class="query-header" onclick="toggleCollapse('MBA')">
+                    <h4>Query: "MBA"</h4>
+                    <button class="collapse-btn" id="btn_MBA">▼</button>
+                </div>
+                <div class="collapsible-content" id="content_MBA">
+                    <div class="card">
+                        <p><strong>Ground Truth (Tiered by Relevance):</strong></p>
+                        <div class="ground-truth">
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MBA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">PGDM</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MBA Finance</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">MBA Marketing</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">BBA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">M.Com</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.Com</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">CA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">CFA</span>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">🏆 Top 3 Performers</h4>
+                        <div class="model-comparison">
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Cosine</h5>
+                                <p><span class="badge badge-excellent">nDCG: 1.0000</span> | Score: 14.0/14.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MBA <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBA Finance <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. PGDM <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. MBA Marketing <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. BBA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L2</h5>
+                                <p><span class="badge badge-excellent">nDCG: 1.0000</span> | Score: 14.0/14.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MBA <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBA Finance <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. PGDM <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. MBA Marketing <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. BBA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L1</h5>
+                                <p><span class="badge badge-excellent">nDCG: 1.0000</span> | Score: 14.0/14.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. MBA Finance <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. MBA <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. PGDM <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. MBA Marketing <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. BBA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">📊 All Configurations</h4>
+                        <table id="table_MBA" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>Distance</th>
+                                    <th>nDCG</th>
+                                    <th>Score</th>
+                                    <th>Retrieved Top-5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>🥇</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-excellent">1.0000</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. PGDM <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. BBA <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥈</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-excellent">1.0000</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. PGDM <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. BBA <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥉</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-excellent">1.0000</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. PGDM <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. BBA <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#4</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">1.0000</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. PGDM <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. BBA <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#5</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-excellent">0.9948</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. PGDM <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#6</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-excellent">0.9948</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. PGDM <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#7</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9948</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. PGDM <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#8</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9948</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. PGDM <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#9</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9948</span></td>
+                                    <td>14.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. PGDM <small>(3.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#10</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-excellent">0.9085</span></td>
+                                    <td>12.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. PGDM <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. M.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#11</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#12</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#13</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#14</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#15</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#16</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#17</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#18</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#19</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#20</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#21</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8576</span></td>
+                                    <td>11.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. BBA <small>(2.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#22</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7558</span></td>
+                                    <td>9.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Master of Journalism <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#23</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7558</span></td>
+                                    <td>9.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Master of Journalism <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#24</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7558</span></td>
+                                    <td>9.0/14.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. MBA Finance <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Marketing <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. MBA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. M.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Master of Journalism <small>(0pts)</small><br></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <div class="query-header" onclick="toggleCollapse('Psychology_Major')">
+                    <h4>Query: "Psychology Major"</h4>
+                    <button class="collapse-btn" id="btn_Psychology_Major">▼</button>
+                </div>
+                <div class="collapsible-content" id="content_Psychology_Major">
+                    <div class="card">
+                        <p><strong>Ground Truth (Tiered by Relevance):</strong></p>
+                        <div class="ground-truth">
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">B.A. Psychology</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">M.A. Psychology</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">Bachelor of Social Work (BSW)</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">Master of Social Work (MSW)</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.A. Sociology</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">B.Ed</span>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">🏆 Top 3 Performers</h4>
+                        <div class="model-comparison">
+
+                            <div class="model-card">
+                                <h5>Text-Embed-004 (768) + Cosine</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9939</span> | Score: 11.0/11.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. M.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. Bachelor of Social Work (BSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. B.A. Sociology <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. Master of Social Work (MSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-004 (768) + L2</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9939</span> | Score: 11.0/11.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. M.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. Bachelor of Social Work (BSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. B.A. Sociology <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. Master of Social Work (MSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-004 (768) + L1</h5>
+                                <p><span class="badge badge-excellent">nDCG: 0.9939</span> | Score: 11.0/11.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. M.A. Psychology <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. Bachelor of Social Work (BSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. B.A. Sociology <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. Master of Social Work (MSW) <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">📊 All Configurations</h4>
+                        <table id="table_Psychology_Major" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>Distance</th>
+                                    <th>nDCG</th>
+                                    <th>Score</th>
+                                    <th>Retrieved Top-5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>🥇</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-excellent">0.9939</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥈</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-excellent">0.9939</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥉</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-excellent">0.9939</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#4</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9939</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#5</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-excellent">0.9842</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 4. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#6</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-excellent">0.9842</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 4. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#7</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-excellent">0.9842</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 4. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#8</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-excellent">0.9842</span></td>
+                                    <td>11.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--success);">✓</span> 4. Bachelor of Social Work (BSW) <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 5. Master of Social Work (MSW) <small>(2.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#9</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#10</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#11</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BBA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#12</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#13</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#14</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#15</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Ph.D. Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#16</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#17</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. Ph.D. Physics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#18</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#19</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#20</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#21</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-fair">0.7552</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.A. Sociology <small>(1.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#22</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7393</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.A. Sociology <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#23</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7393</span></td>
+                                    <td>7.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--success);">✓</span> 5. B.A. Sociology <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#24</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-poor">0.6852</span></td>
+                                    <td>6.0/11.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.A. Psychology <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 3. Ph.D. Physics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 4. B.A. Economics <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.A. History <small>(0pts)</small><br></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <div class="query-header" onclick="toggleCollapse('Accounts_Professional')">
+                    <h4>Query: "Accounts Professional"</h4>
+                    <button class="collapse-btn" id="btn_Accounts_Professional">▼</button>
+                </div>
+                <div class="collapsible-content" id="content_Accounts_Professional">
+                    <div class="card">
+                        <p><strong>Ground Truth (Tiered by Relevance):</strong></p>
+                        <div class="ground-truth">
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">CA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">B.Com Hons</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;" title="⭐⭐⭐ Tier 1">M.Com</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">B.Com</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">MBA Finance</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000;" title="⭐⭐ Tier 2">ICWA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">BBA</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">CS</span>
+                            <span class="gt-item" style="background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); color: #fff;" title="⭐ Tier 3">CFA</span>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">🏆 Top 3 Performers</h4>
+                        <div class="model-comparison">
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + Cosine</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8646</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Com Hons <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. B.Com <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. ICWA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Com <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. CFA <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L2</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8646</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Com Hons <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. B.Com <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. ICWA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Com <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. CFA <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                            <div class="model-card">
+                                <h5>Text-Embed-005 (768) + L1</h5>
+                                <p><span class="badge badge-good">nDCG: 0.8646</span> | Score: 11.0/13.0</p>
+                                <ul class="retrieved-list">
+                                    <li><span class="match-icon match">✓</span> 1. B.Com Hons <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 2. ICWA <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 3. B.Com <small style="opacity:0.7">(⭐⭐ 2.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 4. M.Com <small style="opacity:0.7">(⭐⭐⭐ 3.0pts)</small></li>
+                                    <li><span class="match-icon match">✓</span> 5. CFA <small style="opacity:0.7">(⭐ 1.0pts)</small></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">📊 All Configurations</h4>
+                        <table id="table_Accounts_Professional" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>Distance</th>
+                                    <th>nDCG</th>
+                                    <th>Score</th>
+                                    <th>Retrieved Top-5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>🥇</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8646</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. ICWA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. CFA <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥈</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8646</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. ICWA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. CFA <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>🥉</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8646</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. ICWA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. CFA <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#4</td>
+                                    <td><strong>Text-Embed-005 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8646</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. ICWA <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 5. CFA <small>(1.0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#5</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#6</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#7</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#8</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#9</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#10</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#11</td>
+                                    <td><strong>Gemini-001 (1152)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#12</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#13</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#14</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#15</td>
+                                    <td><strong>Gemini-001 (1536)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#16</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#17</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#18</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#19</td>
+                                    <td><strong>Gemini-001 (3072)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8327</span></td>
+                                    <td>11.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 2. M.Com <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 4. CA <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. BCA <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#20</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Cosine</td>
+                                    <td><span class="badge badge-good">0.8164</span></td>
+                                    <td>10.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. M.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#21</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L2</td>
+                                    <td><span class="badge badge-good">0.8164</span></td>
+                                    <td>10.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. M.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#22</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-good">0.8164</span></td>
+                                    <td>10.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. MBA Marketing <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#23</td>
+                                    <td><strong>Text-Embed-004 (768)</strong></td>
+                                    <td>Inner_Product</td>
+                                    <td><span class="badge badge-good">0.8164</span></td>
+                                    <td>10.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. B.Com Hons <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. MBA Finance <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 4. M.Com <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 5. M.A. Economics <small>(0pts)</small><br></td>
+                                </tr>
+
+                                <tr>
+                                    <td>#24</td>
+                                    <td><strong>Gemini-001 (768)</strong></td>
+                                    <td>L1</td>
+                                    <td><span class="badge badge-fair">0.7177</span></td>
+                                    <td>8.0/13.0</td>
+                                    <td style="line-height: 1.8;"><span style="color: var(--success);">✓</span> 1. CA <small>(3.0pts)</small><br><span style="color: var(--success);">✓</span> 2. B.Com <small>(2.0pts)</small><br><span style="color: var(--success);">✓</span> 3. M.Com <small>(3.0pts)</small><br><span style="color: var(--danger);">✗</span> 4. BCA <small>(0pts)</small><br><span style="color: var(--danger);">✗</span> 5. B.E. Computer Science <small>(0pts)</small><br></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <div id="analysis" class="tab-content">
+            <div class="card">
+                <h3>🔬 Deep Analysis & Insights</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                    Comprehensive performance analysis across all configurations.
+                </p>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Performance by Model</h3>
+                <div id="modelAnalysis" style="margin-top: 1rem;">
+                    <p style="color: var(--text-secondary);">Loading analysis...</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📏 Performance by Distance Metric</h3>
+                <div id="distanceAnalysis" style="margin-top: 1rem;">
+                    <p style="color: var(--text-secondary);">Loading analysis...</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🎯 Performance by Dimension</h3>
+                <div id="dimensionAnalysis" style="margin-top: 1rem;">
+                    <p style="color: var(--text-secondary);">Loading analysis...</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>💡 Key Recommendations</h3>
+                <div id="recommendations" style="margin-top: 1rem;">
+                    <p style="color: var(--text-secondary);">Analyzing results...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="full" class="tab-content">
+            <div class="card">
+                <h3>📋 Complete Results (All Configurations)</h3>
+                <table id="fullTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Model</th>
+                            <th onclick="sortTable(1)">Dimension</th>
+                            <th onclick="sortTable(2)">Distance</th>
+                            <th onclick="sortTable(3)">Avg nDCG ↕</th>
+                            <th onclick="sortTable(4)">Avg MRR ↕</th>
+                            <th onclick="sortTable(5)">Avg Precision@5 ↕</th>
+                            <th onclick="sortTable(6)">Avg Recall@5 ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>768</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>768</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>768</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-excellent">0.9287</span></td>
+                            <td>1.0000</td>
+                            <td>0.9231</td>
+                            <td>0.7015</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-005 (768)</strong></td>
+                            <td>768</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-excellent">0.9053</span></td>
+                            <td>1.0000</td>
+                            <td>0.8923</td>
+                            <td>0.6804</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-004 (768)</strong></td>
+                            <td>768</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-good">0.8510</span></td>
+                            <td>1.0000</td>
+                            <td>0.8022</td>
+                            <td>0.6155</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-004 (768)</strong></td>
+                            <td>768</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-good">0.8397</span></td>
+                            <td>1.0000</td>
+                            <td>0.7901</td>
+                            <td>0.6050</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-004 (768)</strong></td>
+                            <td>768</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-good">0.8397</span></td>
+                            <td>1.0000</td>
+                            <td>0.7901</td>
+                            <td>0.6050</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Text-Embed-004 (768)</strong></td>
+                            <td>768</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-good">0.8397</span></td>
+                            <td>1.0000</td>
+                            <td>0.7901</td>
+                            <td>0.6050</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1152)</strong></td>
+                            <td>1152</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-fair">0.7437</span></td>
+                            <td>0.7778</td>
+                            <td>0.7427</td>
+                            <td>0.5594</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1536)</strong></td>
+                            <td>1536</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-fair">0.7245</span></td>
+                            <td>0.7778</td>
+                            <td>0.7119</td>
+                            <td>0.5383</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (768)</strong></td>
+                            <td>768</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-fair">0.7052</span></td>
+                            <td>0.7778</td>
+                            <td>0.6811</td>
+                            <td>0.5161</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (768)</strong></td>
+                            <td>768</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-fair">0.7052</span></td>
+                            <td>0.7778</td>
+                            <td>0.6811</td>
+                            <td>0.5161</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (768)</strong></td>
+                            <td>768</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-fair">0.7052</span></td>
+                            <td>0.7778</td>
+                            <td>0.6811</td>
+                            <td>0.5161</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1536)</strong></td>
+                            <td>1536</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-fair">0.7033</span></td>
+                            <td>0.7778</td>
+                            <td>0.6998</td>
+                            <td>0.5278</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1152)</strong></td>
+                            <td>1152</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-poor">0.6970</span></td>
+                            <td>0.7778</td>
+                            <td>0.6690</td>
+                            <td>0.5067</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1152)</strong></td>
+                            <td>1152</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-poor">0.6970</span></td>
+                            <td>0.7778</td>
+                            <td>0.6690</td>
+                            <td>0.5067</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1536)</strong></td>
+                            <td>1536</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-poor">0.6970</span></td>
+                            <td>0.7778</td>
+                            <td>0.6690</td>
+                            <td>0.5067</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1536)</strong></td>
+                            <td>1536</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-poor">0.6970</span></td>
+                            <td>0.7778</td>
+                            <td>0.6690</td>
+                            <td>0.5067</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (3072)</strong></td>
+                            <td>3072</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-poor">0.6970</span></td>
+                            <td>0.7778</td>
+                            <td>0.6690</td>
+                            <td>0.5056</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (3072)</strong></td>
+                            <td>3072</td>
+                            <td>Cosine</td>
+                            <td><span class="badge badge-poor">0.6777</span></td>
+                            <td>0.7778</td>
+                            <td>0.6383</td>
+                            <td>0.4845</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (3072)</strong></td>
+                            <td>3072</td>
+                            <td>L2</td>
+                            <td><span class="badge badge-poor">0.6777</span></td>
+                            <td>0.7778</td>
+                            <td>0.6383</td>
+                            <td>0.4845</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (3072)</strong></td>
+                            <td>3072</td>
+                            <td>Inner_Product</td>
+                            <td><span class="badge badge-poor">0.6777</span></td>
+                            <td>0.7778</td>
+                            <td>0.6383</td>
+                            <td>0.4845</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (1152)</strong></td>
+                            <td>1152</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-poor">0.6732</span></td>
+                            <td>0.7778</td>
+                            <td>0.6508</td>
+                            <td>0.4889</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Gemini-001 (768)</strong></td>
+                            <td>768</td>
+                            <td>L1</td>
+                            <td><span class="badge badge-poor">0.6418</span></td>
+                            <td>0.8444</td>
+                            <td>0.5921</td>
+                            <td>0.4512</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Populate Deep Analysis when shown
+            if (tabName === 'analysis' && typeof populateDeepAnalysis === 'function') {
+                populateDeepAnalysis();
+            }
+        }
+        
+        // Collapse/Expand
+        function toggleCollapse(id) {
+            const content = document.getElementById('content_' + id);
+            const btn = document.getElementById('btn_' + id);
+            content.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+        
+        // Table sorting
+        function sortTable(columnIndex) {
+            const table = document.getElementById('fullTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                let aVal = a.cells[columnIndex].textContent.trim();
+                let bVal = b.cells[columnIndex].textContent.trim();
+                
+                // Extract numeric values from badges
+                if (columnIndex >= 3) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                    return bVal - aVal; // Descending for metrics
+                }
+                
+                return aVal.localeCompare(bVal);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Charts
+        const chartColors = {
+            primary: '#6366f1',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6'
+        };
+        
+        // Dimension Chart
+
+        new Chart(document.getElementById('dimensionChart'), {
+            type: 'line',
+            data: {
+                labels: [768, 1152, 1536, 3072],
+                datasets: [{
+                    label: 'Max nDCG by Dimension',
+                    data: [0.9287, 0.7437, 0.7245, 0.697],
+                    borderColor: chartColors.primary,
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#f1f5f9' } },
+                    title: { display: true, text: 'Impact of Embedding Dimension on Performance', color: '#f1f5f9', font: { size: 16 } }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: false,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: { 
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+        
+        // Distance Metric Chart
+
+        new Chart(document.getElementById('distanceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Inner_Product', 'Cosine', 'L2', 'L1'],
+                datasets: [{
+                    label: 'Average nDCG',
+                    data: [0.7699, 0.7576, 0.7576, 0.7453],
+                    backgroundColor: [
+                        chartColors.primary,
+                        chartColors.success,
+                        chartColors.warning,
+                        chartColors.info
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Average Performance by Distance Metric', color: '#f1f5f9', font: { size: 16 } }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: false,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    
+        
+        // ===== DEEP ANALYSIS TAB POPULATION =====
+        function populateDeepAnalysis() {
+            const table = document.getElementById('fullTable');
+            if (!table) return;
+            
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const data = rows.map(row => ({
+                model: row.cells[0].textContent.trim(),
+                dim: parseInt(row.cells[1].textContent),
+                distance: row.cells[2].textContent.trim(),
+                ndcg: parseFloat(row.cells[3].textContent.match(/[0-9.]+/)[0])
+            }));
+            
+            // === Performance by Model ===
+            const byModel = {};
+            data.forEach(d => {
+                if (!byModel[d.model]) byModel[d.model] = [];
+                byModel[d.model].push(d);
+            });
+            
+            let modelHTML = '<table style="width:100%"><thead><tr><th>Model</th><th>Avg nDCG</th><th>Best Distance</th><th>Configs</th></tr></thead><tbody>';
+            Object.keys(byModel).sort((a, b) => {
+                const avgA = byModel[a].reduce((s, d) => s + d.ndcg, 0) / byModel[a].length;
+                const avgB = byModel[b].reduce((s, d) => s + d.ndcg, 0) / byModel[b].length;
+                return avgB - avgA;
+            }).forEach(model => {
+                const modelData = byModel[model];
+                const avg = (modelData.reduce((s, d) => s + d.ndcg, 0) / modelData.length).toFixed(4);
+                const best = modelData.reduce((a, b) => a.ndcg > b.ndcg ? a : b);
+                const badge = avg > 0.9 ? 'excellent' : avg > 0.8 ? 'good' : 'fair';
+                modelHTML += '<tr>' +
+                    '<td><strong>' + model + '</strong></td>' +
+                    '<td><span class="badge badge-' + badge + '">' + avg + '</span></td>' +
+                    '<td>' + best.distance + '</td>' +
+                    '<td>' + modelData.length + '</td>' +
+                '</tr>';
+            });
+            modelHTML += '</tbody></table>';
+            document.getElementById('modelAnalysis').innerHTML = modelHTML;
+            
+            // === Performance by Distance ===
+            const byDistance = {};
+            data.forEach(d => {
+                if (!byDistance[d.distance]) byDistance[d.distance] = [];
+                byDistance[d.distance].push(d);
+            });
+            
+            let distHTML = '<table style="width:100%"><thead><tr><th>Distance Metric</th><th>Avg nDCG</th><th>Std Dev</th><th>Best Model</th></tr></thead><tbody>';
+            Object.keys(byDistance).sort((a, b) => {
+                const avgA = byDistance[a].reduce((s, d) => s + d.ndcg, 0) / byDistance[a].length;
+                const avgB = byDistance[b].reduce((s, d) => s + d.ndcg, 0) / byDistance[b].length;
+                return avgB - avgA;
+            }).forEach(dist => {
+                const distData = byDistance[dist];
+                const avg = distData.reduce((s, d) => s + d.ndcg, 0) / distData.length;
+                const variance = distData.reduce((s, d) => s + Math.pow(d.ndcg - avg, 2), 0) / distData.length;
+                const stdDev = Math.sqrt(variance).toFixed(4);
+                const best = distData.reduce((a, b) => a.ndcg > b.ndcg ? a : b);
+                const badge = avg > 0.9 ? 'excellent' : avg > 0.8 ? 'good' : 'fair';
+                distHTML += '<tr>' +
+                    '<td><strong>' + dist + '</strong></td>' +
+                    '<td><span class="badge badge-' + badge + '">' + avg.toFixed(4) + '</span></td>' +
+                    '<td>' + stdDev + '</td>' +
+                    '<td>' + best.model + '</td>' +
+                '</tr>';
+            });
+            distHTML += '</tbody></table>';
+            document.getElementById('distanceAnalysis').innerHTML = distHTML;
+            
+            // === Performance by Dimension ===
+            const byDim = {};
+            data.forEach(d => {
+                if (!byDim[d.dim]) byDim[d.dim] = [];
+                byDim[d.dim].push(d);
+            });
+            
+            let dimHTML = '<table style="width:100%"><thead><tr><th>Dimension</th><th>Avg nDCG</th><th>Best Config</th></tr></thead><tbody>';
+            Object.keys(byDim).sort((a, b) => parseInt(a) - parseInt(b)).forEach(dim => {
+                const dimData = byDim[dim];
+                const avg = (dimData.reduce((s, d) => s + d.ndcg, 0) / dimData.length).toFixed(4);
+                const best = dimData.reduce((a, b) => a.ndcg > b.ndcg ? a : b);
+                const badge = avg > 0.9 ? 'excellent' : avg > 0.8 ? 'good' : 'fair';
+                dimHTML += '<tr>' +
+                    '<td><strong>' + dim + 'D</strong></td>' +
+                    '<td><span class="badge badge-' + badge + '">' + avg + '</span></td>' +
+                    '<td>' + best.model + ' + ' + best.distance + '</td>' +
+                '</tr>';
+            });
+            dimHTML += '</tbody></table>';
+            document.getElementById('dimensionAnalysis').innerHTML = dimHTML;
+            
+            // === Recommendations ===
+            const bestOverall = data.reduce((a, b) => {
+                if (Math.abs(a.ndcg - b.ndcg) < 0.000001) {
+                    if (a.distance.toLowerCase().includes('cosine')) return a;
+                    if (b.distance.toLowerCase().includes('cosine')) return b;
+                    return a;
+                }
+                return a.ndcg > b.ndcg ? a : b;
+            });
+            const bestDist = Object.keys(byDistance).reduce((a, b) => {
+                const avgA = byDistance[a].reduce((s, d) => s + d.ndcg, 0) / byDistance[a].length;
+                const avgB = byDistance[b].reduce((s, d) => s + d.ndcg, 0) / byDistance[b].length;
+                
+                // Tie-breaker logic
+                if (Math.abs(avgA - avgB) < 0.000001) {
+                    if (a.toLowerCase().includes('cosine')) return a;
+                    if (b.toLowerCase().includes('cosine')) return b;
+                    return a; 
+                }
+                return avgA > avgB ? a : b;
+            });
+            const bestDim = Object.keys(byDim).reduce((a, b) => {
+                const avgA = byDim[a].reduce((s, d) => s + d.ndcg, 0) / byDim[a].length;
+                const avgB = byDim[b].reduce((s, d) => s + d.ndcg, 0) / byDim[b].length;
+                return avgA > avgB ? a : b;
+            });
+            
+            const recHTML = 
+                '<div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid var(--border);">' +
+                    '<h4 style="color: var(--primary); margin-bottom: 0.75rem;">🥇 Production Recommendation</h4>' +
+                    '<p style="line-height: 1.8;">Use <strong>' + bestOverall.model + ' with ' + bestOverall.distance + ' distance</strong> for production. It achieves the highest nDCG (' + bestOverall.ndcg.toFixed(4) + ').</p>' +
+                '</div>' +
+                '<div style="background: rgba(16, 185, 129, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid var(--border);">' +
+                    '<h4 style="color: var(--success); margin-bottom: 0.75rem;">📏 Best Distance Metric</h4>' +
+                    '<p style="line-height: 1.8;"><strong>' + bestDist + '</strong> performs best on average across all models.</p>' +
+                '</div>' +
+                '<div style="background: rgba(245, 158, 11, 0.1); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--border);">' +
+                    '<h4 style="color: var(--warning); margin-bottom: 0.75rem;">🎯 Optimal Dimension</h4>' +
+                    '<p style="line-height: 1.8;"><strong>' + bestDim + 'D embeddings</strong> provide the best average performance.</p>' +
+                '</div>';
+            document.getElementById('recommendations').innerHTML = recHTML;
+        }
+        
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,1840 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approach 4: Gaussian + Cross-Encoder - Detailed Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        
+        h1 { 
+            color: 2d3748; 
+            text-align: center; 
+            margin-bottom: 10px; 
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero-section h2 { 
+            font-size: 3.5em; 
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid #8b5cf6;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card .label {
+            display: block;
+            font-size: 0.85em;
+            color: #718096;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        
+        .stat-card .value {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #8b5cf6;
+        }
+        
+        .config-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .config-box h3 {
+            color: #5b21b6;
+            margin-bottom: 15px;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd6fe;
+        }
+        
+        .config-label {
+            font-weight: 600;
+            color: #6b21a8;
+        }
+        
+        .config-value {
+            color: #7c3aed;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .insights-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .insights-box h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+        
+        .insights-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .insights-box li {
+            padding: 10px 0;
+            color: #78350f;
+            font-size: 1.05em;
+        }
+        
+        .insights-box li:before {
+            content: "💡 ";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Approach 4 Report</h1>
+        <div class="subtitle">Two-Stage: Gaussian Scoring → Cross-Encoder Re-ranking</div>
+        
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h2>0.813</h2>
+            <p>Average NDCG Score (Ranking Quality)</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+                5 scenarios tested | Average latency: 1276ms
+            </p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Avg NDCG</span>
+                <span class="value">0.813</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Avg Precision</span>
+                <span class="value">84.0%</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Avg Recall</span>
+                <span class="value">50.1%</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Avg Latency</span>
+                <span class="value">1276ms</span>
+            </div>
+        </div>
+        
+        <!-- Configuration Section -->
+        <div class="section">
+            <h2 class="section-title">⚙️ Algorithm Configuration</h2>
+            <div class="config-box">
+                <h3>Balanced Two-Stage Approach</h3>
+                <div class="config-item">
+                    <span class="config-label">Stage 1 - Gaussian Scoring:</span>
+                    <span class="config-value">87.46% Semantic + 12.54% Age</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-label">Stage 2 - Cross-Encoder:</span>
+                    <span class="config-value">87.46% CE + 12.54% Age</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-label">Older Age Decay:</span>
+                    <span class="config-value">10.62% per year (Base: 0.8938)</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-label">Younger Age Decay:</span>
+                    <span class="config-value">9.09% per year (Base: 0.9091)</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-label">Hard Filters:</span>
+                    <span class="config-value">Gender + Religion Only (Soft Age/Location)</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-label">Process Flow:</span>
+                    <span class="config-value">Top 50 → Gaussian Top 20 → CE Top 10</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Charts -->
+        <div class="section">
+            <h2 class="section-title">📊 Performance Metrics</h2>
+            <div class="chart-container">
+                <canvas id="performanceChart" height="80"></canvas>
+            </div>
+        </div>
+        
+        <!-- Detailed Scenario Results -->
+        <div class="section">
+            <h2 class="section-title">🔍 Detailed Scenario Results</h2>
+
+            <div style="background: #f9fafb; margin-bottom: 40px; border: 2px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+                <h3 style="color: #7c3aed; margin-bottom: 20px; font-size: 1.3em;">Software/IT Professional in Bangalore</h3>
+                <div style="display: flex; gap: 15px; margin: 15px 0 25px 0; flex-wrap: wrap;">
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Latency: 2601.45ms
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        NDCG: 0.764
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Precision: 80.0%
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Recall: 53.3%
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">✅ Predicted Results (Top 10)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rahul (ID: 732)</strong><br>
+                            Software Developer, B.Tech<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Kartik (ID: 904)</strong><br>
+                            Software Developer, B.E.<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Abhishek (ID: 908)</strong><br>
+                            Software Developer, B.E.<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rohan (ID: 901)</strong><br>
+                            SDE, B.Tech<br>
+                            Bangalore, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.984
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.995
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rahul (ID: 913)</strong><br>
+                            Backend Developer, B.Tech<br>
+                            Bangalore, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.981
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.993
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Siddharth (ID: 909)</strong><br>
+                            Backend Developer, B.Tech<br>
+                            Bangalore, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.981
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.993
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Abhishek (ID: 461)</strong><br>
+                            Software Developer, B.Tech<br>
+                            Delhi, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.977
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.986
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Mohit (ID: 297)</strong><br>
+                            Software Developer, B.Tech<br>
+                            Kolkata, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.974
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.986
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Vikram (ID: 906)</strong><br>
+                            SDE, B.E.<br>
+                            Bangalore, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.973
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.984
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Varun (ID: 907)</strong><br>
+                            Software Developer, B.Tech<br>
+                            Bangalore, Age 31<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.973
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.799
+                                </span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">📋 Ground Truth (Expected Top Matches)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Rahul (ID: 732)</strong> - Relevance: 3<br>
+                            Software Developer, B.Tech<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Kartik (ID: 904)</strong> - Relevance: 3<br>
+                            Software Developer, B.E.<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Abhishek (ID: 908)</strong> - Relevance: 3<br>
+                            Software Developer, B.E.<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Rohan (ID: 901)</strong> - Relevance: 3<br>
+                            SDE, B.Tech<br>
+                            Bangalore, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Vikram (ID: 906)</strong> - Relevance: 3<br>
+                            SDE, B.E.<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Yash (ID: 916)</strong> - Relevance: 3<br>
+                            Software Developer, MCA<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Deepak (ID: 794)</strong> - Relevance: 3<br>
+                            SDE, M.Tech<br>
+                            Bangalore, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Pranav (ID: 905)</strong> - Relevance: 3<br>
+                            SDE, B.Tech<br>
+                            Bangalore, Age 31
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Varun (ID: 907)</strong> - Relevance: 3<br>
+                            Software Developer, B.Tech<br>
+                            Bangalore, Age 31
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ravi (ID: 902)</strong> - Relevance: 3<br>
+                            SDE, B.E.<br>
+                            Bangalore, Age 32
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Karan (ID: 903)</strong> - Relevance: 3<br>
+                            Software Developer, B.Tech<br>
+                            Bangalore, Age 26
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Kartik (ID: 912)</strong> - Relevance: 3<br>
+                            Software Developer, MCA<br>
+                            Bangalore, Age 32
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Siddharth (ID: 909)</strong> - Relevance: 2<br>
+                            Backend Developer, B.Tech<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Rahul (ID: 913)</strong> - Relevance: 2<br>
+                            Backend Developer, B.Tech<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Varun (ID: 245)</strong> - Relevance: 2<br>
+                            Software Developer, MCA<br>
+                            Bangalore, Age 34
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+    
+            <div style="background: #f9fafb; margin-bottom: 40px; border: 2px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+                <h3 style="color: #7c3aed; margin-bottom: 20px; font-size: 1.3em;">Medical Professional (Doctor/Surgeon)</h3>
+                <div style="display: flex; gap: 15px; margin: 15px 0 25px 0; flex-wrap: wrap;">
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Latency: 678.93ms
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        NDCG: 0.836
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Precision: 80.0%
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Recall: 40.0%
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">✅ Predicted Results (Top 10)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Mayank (ID: 924)</strong><br>
+                            Surgeon, MBBS<br>
+                            Delhi, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.961
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.981
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Abhishek (ID: 188)</strong><br>
+                            Surgeon, MBBS<br>
+                            Mumbai, Age 26<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.953
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.982
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.751
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Vivek (ID: 923)</strong><br>
+                            Surgeon, MBBS<br>
+                            Gurgaon, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.945
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.962
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rohan (ID: 206)</strong><br>
+                            Surgeon, MBBS<br>
+                            Hyderabad, Age 25<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.942
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.979
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.683
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Aditya (ID: 853)</strong><br>
+                            Doctor, MBBS<br>
+                            Chennai, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.930
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.920
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Vikram (ID: 246)</strong><br>
+                            Doctor, MBBS<br>
+                            Mumbai, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.929
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.934
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Akash (ID: 256)</strong><br>
+                            Doctor, MBBS<br>
+                            Mumbai, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.926
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.940
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Akash (ID: 211)</strong><br>
+                            Surgeon, MBBS<br>
+                            Kolkata, Age 23<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.923
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.975
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.565
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Sahil (ID: 705)</strong><br>
+                            Doctor, MBBS<br>
+                            Ahmedabad, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.922
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.911
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Vikram (ID: 922)</strong><br>
+                            Doctor, MBBS<br>
+                            Pune, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.912
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.925
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">📋 Ground Truth (Expected Top Matches)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Sahil (ID: 705)</strong> - Relevance: 3<br>
+                            Doctor, MBBS<br>
+                            Ahmedabad, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Aditya (ID: 853)</strong> - Relevance: 3<br>
+                            Doctor, MBBS<br>
+                            Chennai, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Mohit (ID: 928)</strong> - Relevance: 3<br>
+                            Surgeon, MD<br>
+                            Hyderabad, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Vikram (ID: 246)</strong> - Relevance: 3<br>
+                            Doctor, MBBS<br>
+                            Mumbai, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Pranav (ID: 590)</strong> - Relevance: 3<br>
+                            Doctor, MD<br>
+                            Gurgaon, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ravi (ID: 677)</strong> - Relevance: 3<br>
+                            Surgeon, MD<br>
+                            Hyderabad, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Sanjay (ID: 925)</strong> - Relevance: 3<br>
+                            Doctor, MD<br>
+                            Kolkata, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Varun (ID: 927)</strong> - Relevance: 3<br>
+                            Surgeon, MD<br>
+                            Kolkata, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Mayank (ID: 935)</strong> - Relevance: 3<br>
+                            Surgeon, MS (Surgery)<br>
+                            Pune, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Deepak (ID: 936)</strong> - Relevance: 3<br>
+                            Surgeon, MS (Surgery)<br>
+                            Gurgaon, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Akash (ID: 256)</strong> - Relevance: 3<br>
+                            Doctor, MBBS<br>
+                            Mumbai, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Vikram (ID: 922)</strong> - Relevance: 3<br>
+                            Doctor, MBBS<br>
+                            Pune, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Vivek (ID: 923)</strong> - Relevance: 3<br>
+                            Surgeon, MBBS<br>
+                            Gurgaon, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Mayank (ID: 924)</strong> - Relevance: 3<br>
+                            Surgeon, MBBS<br>
+                            Delhi, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Arjun (ID: 134)</strong> - Relevance: 3<br>
+                            Doctor, MD<br>
+                            Gurgaon, Age 26
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+    
+            <div style="background: #f9fafb; margin-bottom: 40px; border: 2px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+                <h3 style="color: #7c3aed; margin-bottom: 20px; font-size: 1.3em;">Finance Professional in Mumbai</h3>
+                <div style="display: flex; gap: 15px; margin: 15px 0 25px 0; flex-wrap: wrap;">
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Latency: 1212.94ms
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        NDCG: 0.669
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Precision: 90.0%
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Recall: 47.4%
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">✅ Predicted Results (Top 10)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Pranav (ID: 943)</strong><br>
+                            Finance Manager, CA<br>
+                            Mumbai, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.975
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.971
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Arjun (ID: 944)</strong><br>
+                            Finance Manager, CA<br>
+                            Mumbai, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.975
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.971
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Abhishek (ID: 584)</strong><br>
+                            Finance Manager, CA<br>
+                            Mumbai, Age 21<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.918
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.969
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.565
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Suresh (ID: 951)</strong><br>
+                            Auditor, CA<br>
+                            Mumbai, Age 25<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.832
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.833
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rahul (ID: 287)</strong><br>
+                            Auditor, CA<br>
+                            Mumbai, Age 25<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.832
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.833
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Ankit (ID: 952)</strong><br>
+                            Auditor, CA<br>
+                            Mumbai, Age 31<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.819
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.844
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.638
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Aditya (ID: 799)</strong><br>
+                            Auditor, CA<br>
+                            Mumbai, Age 22<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.809
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.836
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.621
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Rajesh (ID: 955)</strong><br>
+                            Finance Manager, M.Com<br>
+                            Mumbai, Age 26<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.789
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.771
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Kartik (ID: 956)</strong><br>
+                            Finance Manager, M.Com<br>
+                            Mumbai, Age 31<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.752
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.769
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.638
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Ravi (ID: 945)</strong><br>
+                            Finance Manager, MBA<br>
+                            Mumbai, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.728
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.704
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">📋 Ground Truth (Expected Top Matches)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Pranav (ID: 943)</strong> - Relevance: 3<br>
+                            Finance Manager, CA<br>
+                            Mumbai, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Arjun (ID: 944)</strong> - Relevance: 3<br>
+                            Finance Manager, CA<br>
+                            Mumbai, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Ravi (ID: 945)</strong> - Relevance: 3<br>
+                            Finance Manager, MBA<br>
+                            Mumbai, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Mohit (ID: 947)</strong> - Relevance: 3<br>
+                            Chartered Accountant, CA<br>
+                            Mumbai, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Rajesh (ID: 955)</strong> - Relevance: 3<br>
+                            Finance Manager, M.Com<br>
+                            Mumbai, Age 26
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ishaan (ID: 948)</strong> - Relevance: 3<br>
+                            Chartered Accountant, CA<br>
+                            Mumbai, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Harsh (ID: 942)</strong> - Relevance: 3<br>
+                            Chartered Accountant, CA<br>
+                            Mumbai, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ankit (ID: 946)</strong> - Relevance: 3<br>
+                            Finance Manager, MBA<br>
+                            Mumbai, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Rahul (ID: 287)</strong> - Relevance: 2<br>
+                            Auditor, CA<br>
+                            Mumbai, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Suresh (ID: 951)</strong> - Relevance: 2<br>
+                            Auditor, CA<br>
+                            Mumbai, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Kartik (ID: 956)</strong> - Relevance: 2<br>
+                            Finance Manager, M.Com<br>
+                            Mumbai, Age 31
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ishaan (ID: 941)</strong> - Relevance: 2<br>
+                            Chartered Accountant, CA<br>
+                            Mumbai, Age 32
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Aditya (ID: 864)</strong> - Relevance: 1<br>
+                            Financial Analyst, MBA<br>
+                            Mumbai, Age 23
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Pranav (ID: 949)</strong> - Relevance: 1<br>
+                            Financial Analyst, MBA<br>
+                            Mumbai, Age 31
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Ankit (ID: 952)</strong> - Relevance: 1<br>
+                            Auditor, CA<br>
+                            Mumbai, Age 31
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+    
+            <div style="background: #f9fafb; margin-bottom: 40px; border: 2px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+                <h3 style="color: #7c3aed; margin-bottom: 20px; font-size: 1.3em;">Designer/PM in Bangalore</h3>
+                <div style="display: flex; gap: 15px; margin: 15px 0 25px 0; flex-wrap: wrap;">
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Latency: 738.98ms
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        NDCG: 0.936
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Precision: 90.0%
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Recall: 60.0%
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">✅ Predicted Results (Top 10)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Kiara (ID: 973)</strong><br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.991
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Diya (ID: 963)</strong><br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.991
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Sakshi (ID: 964)</strong><br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.991
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Sakshi (ID: 961)</strong><br>
+                            UI/UX Designer, B.Tech<br>
+                            Bangalore, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.986
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Myra (ID: 962)</strong><br>
+                            UI/UX Designer, B.Tech<br>
+                            Bangalore, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.984
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Divya (ID: 975)</strong><br>
+                            UI/UX Designer, BFA<br>
+                            Bangalore, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.977
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.986
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Megha (ID: 965)</strong><br>
+                            UI/UX Designer, Bachelor of Design<br>
+                            Bangalore, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.975
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.984
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Vanshika (ID: 966)</strong><br>
+                            UI/UX Designer, Bachelor of Design<br>
+                            Bangalore, Age 30<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.972
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.983
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Divya (ID: 974)</strong><br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.969
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.827
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Ananya (ID: 979)</strong><br>
+                            Web Designer, B.Tech<br>
+                            Bangalore, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.962
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.970
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">📋 Ground Truth (Expected Top Matches)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Meera (ID: 101)</strong> - Relevance: 3<br>
+                            Product Manager, MBA<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Diya (ID: 963)</strong> - Relevance: 3<br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Sakshi (ID: 964)</strong> - Relevance: 3<br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Kavya (ID: 967)</strong> - Relevance: 3<br>
+                            Product Manager, MBA<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Divya (ID: 968)</strong> - Relevance: 3<br>
+                            Product Manager, MBA<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Kiara (ID: 973)</strong> - Relevance: 3<br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 29
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Sakshi (ID: 961)</strong> - Relevance: 3<br>
+                            UI/UX Designer, B.Tech<br>
+                            Bangalore, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Myra (ID: 962)</strong> - Relevance: 3<br>
+                            UI/UX Designer, B.Tech<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Megha (ID: 965)</strong> - Relevance: 3<br>
+                            UI/UX Designer, Bachelor of Design<br>
+                            Bangalore, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Vanshika (ID: 966)</strong> - Relevance: 3<br>
+                            UI/UX Designer, Bachelor of Design<br>
+                            Bangalore, Age 30
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Divya (ID: 975)</strong> - Relevance: 3<br>
+                            UI/UX Designer, BFA<br>
+                            Bangalore, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Divya (ID: 974)</strong> - Relevance: 3<br>
+                            Product Manager, B.Tech<br>
+                            Bangalore, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Simran (ID: 976)</strong> - Relevance: 3<br>
+                            UI/UX Designer, BFA<br>
+                            Bangalore, Age 26
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Sakshi (ID: 970)</strong> - Relevance: 2<br>
+                            Product Designer, Bachelor of Design<br>
+                            Bangalore, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Aarti (ID: 969)</strong> - Relevance: 2<br>
+                            Product Designer, Bachelor of Design<br>
+                            Bangalore, Age 26
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+    
+            <div style="background: #f9fafb; margin-bottom: 40px; border: 2px solid #e5e7eb; padding: 30px; border-radius: 12px;">
+                <h3 style="color: #7c3aed; margin-bottom: 20px; font-size: 1.3em;">Data Scientist in Hyderabad</h3>
+                <div style="display: flex; gap: 15px; margin: 15px 0 25px 0; flex-wrap: wrap;">
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Latency: 1147.04ms
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        NDCG: 0.858
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Precision: 80.0%
+                    </div>
+                    <div style="background: #ddd6fe; padding: 12px 20px; border-radius: 8px; color: #5b21b6; font-weight: 600;">
+                        Recall: 50.0%
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">✅ Predicted Results (Top 10)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Pooja (ID: 994)</strong><br>
+                            Data Scientist, B.Tech<br>
+                            Hyderabad, Age 25<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Aaradhya (ID: 987)</strong><br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 25<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.991
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 1.000
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Swati (ID: 982)</strong><br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 24<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.987
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Preeti (ID: 986)</strong><br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 26<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.985
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Shruti (ID: 981)</strong><br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 26<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.985
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Riya (ID: 998)</strong><br>
+                            Data Analyst, M.Tech<br>
+                            Hyderabad, Age 26<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.982
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.994
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.894
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Ishita (ID: 983)</strong><br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 24<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.979
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.989
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.909
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Sakshi (ID: 985)</strong><br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.973
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.998
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.799
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #8b5cf6; background: linear-gradient(90deg, #faf5ff 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Simran (ID: 993)</strong><br>
+                            Data Scientist, B.Tech<br>
+                            Hyderabad, Age 27<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.972
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.997
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.799
+                                </span>
+                            </div>
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; border-left: 5px solid #ef4444; background: linear-gradient(90deg, #fef2f2 0%, white 100%); padding: 15px; margin-bottom: 12px; border-radius: 8px; transition: all 0.2s;">
+                            <strong>Sara (ID: 997)</strong><br>
+                            Data Analyst, M.Tech<br>
+                            Hyderabad, Age 28<br>
+                            <div style="margin-top: 8px;">
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    Final: 0.959
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px;">
+                                    CE: 0.994
+                                </span>
+                                <span style="display: inline-block; background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 0.85em;">
+                                    Age: 0.714
+                                </span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div>
+                        <h4 style="color: #374151; margin-bottom: 15px; font-size: 1.1em;">📋 Ground Truth (Expected Top Matches)</h4>
+    
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Aaradhya (ID: 987)</strong> - Relevance: 3<br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Saanvi (ID: 990)</strong> - Relevance: 3<br>
+                            ML Engineer, M.Tech<br>
+                            Hyderabad, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Pooja (ID: 994)</strong> - Relevance: 3<br>
+                            Data Scientist, B.Tech<br>
+                            Hyderabad, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Simran (ID: 995)</strong> - Relevance: 3<br>
+                            ML Engineer, MS in CS<br>
+                            Hyderabad, Age 25
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Shruti (ID: 981)</strong> - Relevance: 3<br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 26
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Swati (ID: 982)</strong> - Relevance: 3<br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 24
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Ishita (ID: 983)</strong> - Relevance: 3<br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 24
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Preeti (ID: 986)</strong> - Relevance: 3<br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 26
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Sakshi (ID: 985)</strong> - Relevance: 3<br>
+                            Data Scientist, M.Tech<br>
+                            Hyderabad, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Ishita (ID: 989)</strong> - Relevance: 3<br>
+                            ML Engineer, M.Tech<br>
+                            Hyderabad, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #059669; font-weight: bold;">✓ Found</div>
+                            <strong>Simran (ID: 993)</strong> - Relevance: 3<br>
+                            Data Scientist, B.Tech<br>
+                            Hyderabad, Age 27
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Kavya (ID: 984)</strong> - Relevance: 3<br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Sakshi (ID: 988)</strong> - Relevance: 3<br>
+                            Data Scientist, MS in CS<br>
+                            Hyderabad, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Shruti (ID: 996)</strong> - Relevance: 3<br>
+                            ML Engineer, MS in CS<br>
+                            Hyderabad, Age 28
+                        </div>
+        
+                        <div style="border: 2px solid #e5e7eb; padding: 15px; margin-bottom: 12px; border-radius: 8px; background: white;">
+                            <div style="float: right; color: #9ca3af;">○ Missed</div>
+                            <strong>Pari (ID: 991)</strong> - Relevance: 2<br>
+                            AI Engineer, MS in CS<br>
+                            Hyderabad, Age 24
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+        
+        <!-- Key Insights -->
+        <div class="insights-box">
+            <h3>🔑 Key Insights</h3>
+            <ul>
+                <li><strong>Two-Stage Processing:</strong> Gaussian scoring narrows 50 candidates to 20, then cross-encoder refines to top 10 for efficiency.</li>
+                <li><strong>Balanced Weights:</strong> 87.46% semantic + 12.54% age maintained in BOTH stages for consistency.</li>
+                <li><strong>Soft Filters Only:</strong> Only Gender and Religion are hard filters - Age and Location are soft (scored, not filtered).</li>
+                <li><strong>Age Preserved:</strong> Unlike old approach, age scoring is combined with CE in final stage, not dropped.</li>
+                <li><strong>Symmetric Decay:</strong> Nearly equal decay rates (10.62% vs 9.09%) treat older/younger candidates fairly.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {{
+            type: 'bar',
+            data: {{
+                labels: {[f"Scenario {r['scenario_id']}" for r in results]},
+                datasets: [
+                    {{
+                        label: 'NDCG',
+                        data: {[r['ndcg'] for r in results]},
+                        backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 2
+                    }},
+                    {{
+                        label: 'Precision (%)',
+                        data: {[r['precision']/100 for r in results]},
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }},
+                    {{
+                        label: 'Recall (%)',
+                        data: {[r['recall']/100 for r in results]},
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 2
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{
+                    legend: {{ display: true, position: 'top' }},
+                    title: {{ 
+                        display: true,
+                        text: 'Performance Across All Scenarios',
+                        font: {{ size: 16 }}
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        max: 1.1,
+                        title: {{ display: true, text: 'Score' }}
+                    }}
+                }}
+            }}
+        }});
+    </script>
+</body>
+</html>

@@ -1,0 +1,832 @@
+{
+  "approach": "Approach 1: Semantic Search + Gaussian Age Scoring",
+  "summary": {
+    "average_latency_ms": 1200.12,
+    "average_ndcg": 0.926,
+    "average_precision": 90.0,
+    "average_recall": 54.06,
+    "total_scenarios": 5
+  },
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "scenario_name": "Software/IT Professional in Bangalore",
+      "query": "Looking for Software Developer or SDE with B.Tech and lives in Bangalore",
+      "searcher": {
+        "gender": "Female",
+        "age": 26,
+        "religion": "Hindu"
+      },
+      "filters": {
+        "gender": "Male",
+        "religion": "Hindu",
+        "preferred_age": 29
+      },
+      "performance": {
+        "latency_ms": 2549.74,
+        "ndcg": 1.0,
+        "precision": 100.0,
+        "recall": 66.67
+      },
+      "ground_truth_ids": [
+        732,
+        904,
+        908,
+        901,
+        906,
+        916,
+        794,
+        905,
+        907,
+        902,
+        903,
+        912,
+        909,
+        913,
+        245
+      ],
+      "predicted_top_10": [
+        901,
+        732,
+        905,
+        906,
+        904,
+        908,
+        907,
+        794,
+        903,
+        902
+      ],
+      "predicted_profiles": [
+        {
+          "user_id": 901,
+          "name": "Rohan",
+          "age": 28,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "SDE",
+          "semantic_score": 0.7829,
+          "age_score": 0.9091,
+          "final_score": 0.7988
+        },
+        {
+          "user_id": 732,
+          "name": "Rahul",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Software Developer",
+          "semantic_score": 0.7662,
+          "age_score": 1.0,
+          "final_score": 0.7955
+        },
+        {
+          "user_id": 905,
+          "name": "Pranav",
+          "age": 31,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "SDE",
+          "semantic_score": 0.7829,
+          "age_score": 0.7989,
+          "final_score": 0.7849
+        },
+        {
+          "user_id": 906,
+          "name": "Vikram",
+          "age": 30,
+          "location": "Bangalore",
+          "education": "B.E.",
+          "job_title": "SDE",
+          "semantic_score": 0.7613,
+          "age_score": 0.8938,
+          "final_score": 0.7779
+        },
+        {
+          "user_id": 904,
+          "name": "Kartik",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.E.",
+          "job_title": "Software Developer",
+          "semantic_score": 0.7449,
+          "age_score": 1.0,
+          "final_score": 0.7769
+        },
+        {
+          "user_id": 908,
+          "name": "Abhishek",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.E.",
+          "job_title": "Software Developer",
+          "semantic_score": 0.7449,
+          "age_score": 1.0,
+          "final_score": 0.7769
+        },
+        {
+          "user_id": 907,
+          "name": "Varun",
+          "age": 31,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Software Developer",
+          "semantic_score": 0.7662,
+          "age_score": 0.7989,
+          "final_score": 0.7703
+        },
+        {
+          "user_id": 794,
+          "name": "Deepak",
+          "age": 27,
+          "location": "Bangalore",
+          "education": "M.Tech",
+          "job_title": "SDE",
+          "semantic_score": 0.7608,
+          "age_score": 0.8265,
+          "final_score": 0.769
+        },
+        {
+          "user_id": 903,
+          "name": "Karan",
+          "age": 26,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Software Developer",
+          "semantic_score": 0.7662,
+          "age_score": 0.7513,
+          "final_score": 0.7644
+        },
+        {
+          "user_id": 902,
+          "name": "Ravi",
+          "age": 32,
+          "location": "Bangalore",
+          "education": "B.E.",
+          "job_title": "SDE",
+          "semantic_score": 0.7613,
+          "age_score": 0.714,
+          "final_score": 0.7554
+        }
+      ]
+    },
+    {
+      "scenario_id": 2,
+      "scenario_name": "Medical Professional (Doctor/Surgeon)",
+      "query": "Looking for Doctor or Surgeon with MBBS",
+      "searcher": {
+        "gender": "Female",
+        "age": 28,
+        "religion": "Hindu"
+      },
+      "filters": {
+        "gender": "Male",
+        "religion": "Hindu",
+        "preferred_age": 29
+      },
+      "performance": {
+        "latency_ms": 566.07,
+        "ndcg": 0.867,
+        "precision": 80.0,
+        "recall": 40.0
+      },
+      "ground_truth_ids": [
+        705,
+        853,
+        928,
+        246,
+        590,
+        677,
+        925,
+        927,
+        935,
+        936,
+        256,
+        922,
+        923,
+        924,
+        134,
+        178,
+        188,
+        407,
+        492,
+        564
+      ],
+      "predicted_top_10": [
+        923,
+        924,
+        188,
+        928,
+        927,
+        246,
+        677,
+        206,
+        256,
+        871
+      ],
+      "predicted_profiles": [
+        {
+          "user_id": 923,
+          "name": "Vivek",
+          "age": 27,
+          "location": "Gurgaon",
+          "education": "MBBS",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7399,
+          "age_score": 0.8265,
+          "final_score": 0.7508
+        },
+        {
+          "user_id": 924,
+          "name": "Mayank",
+          "age": 27,
+          "location": "Delhi",
+          "education": "MBBS",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7381,
+          "age_score": 0.8265,
+          "final_score": 0.7491
+        },
+        {
+          "user_id": 188,
+          "name": "Abhishek",
+          "age": 26,
+          "location": "Mumbai",
+          "education": "MBBS",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7436,
+          "age_score": 0.7513,
+          "final_score": 0.7446
+        },
+        {
+          "user_id": 928,
+          "name": "Mohit",
+          "age": 29,
+          "location": "Hyderabad",
+          "education": "MD",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7075,
+          "age_score": 1.0,
+          "final_score": 0.7441
+        },
+        {
+          "user_id": 927,
+          "name": "Varun",
+          "age": 30,
+          "location": "Kolkata",
+          "education": "MD",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7158,
+          "age_score": 0.8938,
+          "final_score": 0.7381
+        },
+        {
+          "user_id": 246,
+          "name": "Vikram",
+          "age": 30,
+          "location": "Mumbai",
+          "education": "MBBS",
+          "job_title": "Doctor",
+          "semantic_score": 0.71,
+          "age_score": 0.8938,
+          "final_score": 0.7331
+        },
+        {
+          "user_id": 677,
+          "name": "Ravi",
+          "age": 30,
+          "location": "Hyderabad",
+          "education": "MD",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7075,
+          "age_score": 0.8938,
+          "final_score": 0.7308
+        },
+        {
+          "user_id": 206,
+          "name": "Rohan",
+          "age": 25,
+          "location": "Hyderabad",
+          "education": "MBBS",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7332,
+          "age_score": 0.683,
+          "final_score": 0.7269
+        },
+        {
+          "user_id": 256,
+          "name": "Akash",
+          "age": 27,
+          "location": "Mumbai",
+          "education": "MBBS",
+          "job_title": "Doctor",
+          "semantic_score": 0.71,
+          "age_score": 0.8265,
+          "final_score": 0.7246
+        },
+        {
+          "user_id": 871,
+          "name": "Harsh",
+          "age": 26,
+          "location": "Chennai",
+          "education": "MD",
+          "job_title": "Surgeon",
+          "semantic_score": 0.7176,
+          "age_score": 0.7513,
+          "final_score": 0.7218
+        }
+      ]
+    },
+    {
+      "scenario_id": 3,
+      "scenario_name": "Finance Professional in Mumbai",
+      "query": "Looking for Finance Professional (CA / Finance Manager / Analyst / Auditor) and lives in Mumbai",
+      "searcher": {
+        "gender": "Female",
+        "age": 24,
+        "religion": "Hindu"
+      },
+      "filters": {
+        "gender": "Male",
+        "religion": "Hindu",
+        "preferred_age": 27
+      },
+      "performance": {
+        "latency_ms": 1115.85,
+        "ndcg": 0.904,
+        "precision": 90.0,
+        "recall": 47.37
+      },
+      "ground_truth_ids": [
+        943,
+        944,
+        945,
+        947,
+        955,
+        948,
+        942,
+        946,
+        287,
+        951,
+        956,
+        941,
+        864,
+        949,
+        952,
+        457,
+        653,
+        799,
+        950
+      ],
+      "predicted_top_10": [
+        943,
+        944,
+        945,
+        955,
+        951,
+        287,
+        947,
+        584,
+        946,
+        948
+      ],
+      "predicted_profiles": [
+        {
+          "user_id": 943,
+          "name": "Pranav",
+          "age": 27,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7607,
+          "age_score": 1.0,
+          "final_score": 0.7908
+        },
+        {
+          "user_id": 944,
+          "name": "Arjun",
+          "age": 27,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7607,
+          "age_score": 1.0,
+          "final_score": 0.7908
+        },
+        {
+          "user_id": 945,
+          "name": "Ravi",
+          "age": 28,
+          "location": "Mumbai",
+          "education": "MBA",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7368,
+          "age_score": 0.8938,
+          "final_score": 0.7565
+        },
+        {
+          "user_id": 955,
+          "name": "Rajesh",
+          "age": 26,
+          "location": "Mumbai",
+          "education": "M.Com",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7308,
+          "age_score": 0.9091,
+          "final_score": 0.7532
+        },
+        {
+          "user_id": 951,
+          "name": "Suresh",
+          "age": 25,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Auditor",
+          "semantic_score": 0.7306,
+          "age_score": 0.8265,
+          "final_score": 0.7426
+        },
+        {
+          "user_id": 287,
+          "name": "Rahul",
+          "age": 25,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Auditor",
+          "semantic_score": 0.7306,
+          "age_score": 0.8265,
+          "final_score": 0.7426
+        },
+        {
+          "user_id": 947,
+          "name": "Mohit",
+          "age": 28,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Chartered Accountant",
+          "semantic_score": 0.7182,
+          "age_score": 0.8938,
+          "final_score": 0.7402
+        },
+        {
+          "user_id": 584,
+          "name": "Abhishek",
+          "age": 21,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7607,
+          "age_score": 0.5645,
+          "final_score": 0.7361
+        },
+        {
+          "user_id": 946,
+          "name": "Ankit",
+          "age": 30,
+          "location": "Mumbai",
+          "education": "MBA",
+          "job_title": "Finance Manager",
+          "semantic_score": 0.7368,
+          "age_score": 0.714,
+          "final_score": 0.734
+        },
+        {
+          "user_id": 948,
+          "name": "Ishaan",
+          "age": 29,
+          "location": "Mumbai",
+          "education": "CA",
+          "job_title": "Chartered Accountant",
+          "semantic_score": 0.7182,
+          "age_score": 0.7989,
+          "final_score": 0.7283
+        }
+      ]
+    },
+    {
+      "scenario_id": 4,
+      "scenario_name": "Designer/PM in Bangalore",
+      "query": "Looking for UI/UX Designer or Product Manager with B.Tech and lives in Bangalore",
+      "searcher": {
+        "gender": "Male",
+        "age": 30,
+        "religion": "Hindu"
+      },
+      "filters": {
+        "gender": "Female",
+        "religion": "Hindu",
+        "preferred_age": 29
+      },
+      "performance": {
+        "latency_ms": 673.34,
+        "ndcg": 0.927,
+        "precision": 90.0,
+        "recall": 60.0
+      },
+      "ground_truth_ids": [
+        101,
+        963,
+        964,
+        967,
+        968,
+        973,
+        961,
+        962,
+        965,
+        966,
+        975,
+        974,
+        976,
+        970,
+        969
+      ],
+      "predicted_top_10": [
+        964,
+        963,
+        973,
+        961,
+        962,
+        974,
+        972,
+        967,
+        101,
+        968
+      ],
+      "predicted_profiles": [
+        {
+          "user_id": 964,
+          "name": "Sakshi",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7447,
+          "age_score": 1.0,
+          "final_score": 0.7767
+        },
+        {
+          "user_id": 963,
+          "name": "Diya",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7447,
+          "age_score": 1.0,
+          "final_score": 0.7767
+        },
+        {
+          "user_id": 973,
+          "name": "Kiara",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7447,
+          "age_score": 1.0,
+          "final_score": 0.7767
+        },
+        {
+          "user_id": 961,
+          "name": "Sakshi",
+          "age": 28,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "UI/UX Designer",
+          "semantic_score": 0.7528,
+          "age_score": 0.9091,
+          "final_score": 0.7724
+        },
+        {
+          "user_id": 962,
+          "name": "Myra",
+          "age": 30,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "UI/UX Designer",
+          "semantic_score": 0.7528,
+          "age_score": 0.8938,
+          "final_score": 0.7705
+        },
+        {
+          "user_id": 974,
+          "name": "Divya",
+          "age": 27,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7447,
+          "age_score": 0.8265,
+          "final_score": 0.755
+        },
+        {
+          "user_id": 972,
+          "name": "Nisha",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "B.Tech",
+          "job_title": "UX Researcher",
+          "semantic_score": 0.7149,
+          "age_score": 1.0,
+          "final_score": 0.7506
+        },
+        {
+          "user_id": 967,
+          "name": "Kavya",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "MBA",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7136,
+          "age_score": 1.0,
+          "final_score": 0.7495
+        },
+        {
+          "user_id": 101,
+          "name": "Meera",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "MBA",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7136,
+          "age_score": 1.0,
+          "final_score": 0.7495
+        },
+        {
+          "user_id": 968,
+          "name": "Divya",
+          "age": 29,
+          "location": "Bangalore",
+          "education": "MBA",
+          "job_title": "Product Manager",
+          "semantic_score": 0.7136,
+          "age_score": 1.0,
+          "final_score": 0.7495
+        }
+      ]
+    },
+    {
+      "scenario_id": 5,
+      "scenario_name": "Data Scientist in Hyderabad",
+      "query": "Looking for Data Scientist with M.Tech and lives in Hyderabad",
+      "searcher": {
+        "gender": "Male",
+        "age": 27,
+        "religion": "Hindu"
+      },
+      "filters": {
+        "gender": "Female",
+        "religion": "Hindu",
+        "preferred_age": 25
+      },
+      "performance": {
+        "latency_ms": 1095.61,
+        "ndcg": 0.934,
+        "precision": 90.0,
+        "recall": 56.25
+      },
+      "ground_truth_ids": [
+        987,
+        990,
+        994,
+        995,
+        981,
+        982,
+        983,
+        986,
+        985,
+        989,
+        993,
+        984,
+        988,
+        996,
+        991,
+        992
+      ],
+      "predicted_top_10": [
+        982,
+        986,
+        981,
+        987,
+        985,
+        994,
+        983,
+        990,
+        998,
+        993
+      ],
+      "predicted_profiles": [
+        {
+          "user_id": 982,
+          "name": "Swati",
+          "age": 24,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.8067,
+          "age_score": 0.9091,
+          "final_score": 0.8195
+        },
+        {
+          "user_id": 986,
+          "name": "Preeti",
+          "age": 26,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.8067,
+          "age_score": 0.8938,
+          "final_score": 0.8176
+        },
+        {
+          "user_id": 981,
+          "name": "Shruti",
+          "age": 26,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.8067,
+          "age_score": 0.8938,
+          "final_score": 0.8176
+        },
+        {
+          "user_id": 987,
+          "name": "Aaradhya",
+          "age": 25,
+          "location": "Hyderabad",
+          "education": "MS in CS",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.78,
+          "age_score": 1.0,
+          "final_score": 0.8076
+        },
+        {
+          "user_id": 985,
+          "name": "Sakshi",
+          "age": 27,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.8067,
+          "age_score": 0.7989,
+          "final_score": 0.8057
+        },
+        {
+          "user_id": 994,
+          "name": "Pooja",
+          "age": 25,
+          "location": "Hyderabad",
+          "education": "B.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.777,
+          "age_score": 1.0,
+          "final_score": 0.805
+        },
+        {
+          "user_id": 983,
+          "name": "Ishita",
+          "age": 24,
+          "location": "Hyderabad",
+          "education": "MS in CS",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.78,
+          "age_score": 0.9091,
+          "final_score": 0.7962
+        },
+        {
+          "user_id": 990,
+          "name": "Saanvi",
+          "age": 25,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "ML Engineer",
+          "semantic_score": 0.7547,
+          "age_score": 1.0,
+          "final_score": 0.7855
+        },
+        {
+          "user_id": 998,
+          "name": "Riya",
+          "age": 26,
+          "location": "Hyderabad",
+          "education": "M.Tech",
+          "job_title": "Data Analyst",
+          "semantic_score": 0.7655,
+          "age_score": 0.8938,
+          "final_score": 0.7816
+        },
+        {
+          "user_id": 993,
+          "name": "Simran",
+          "age": 27,
+          "location": "Hyderabad",
+          "education": "B.Tech",
+          "job_title": "Data Scientist",
+          "semantic_score": 0.777,
+          "age_score": 0.7989,
+          "final_score": 0.7797
+        }
+      ]
+    }
+  ]
+}

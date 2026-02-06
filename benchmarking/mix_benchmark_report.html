@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrimony Search Benchmark</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #cbd5e1; padding: 2rem; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .card { background: #1e293b; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #334155; }
+        h1 { background: linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; }
+        th { background: #334155; padding: 1rem; text-align: left; font-size: 0.9em; color: #fff; border-radius: 8px 8px 0 0; }
+        td { padding: 0.5rem; background: #1e293b; border-bottom: 1px solid #334155; vertical-align: top; }
+        .tag { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-right: 4px; display: inline-block; margin-top: 4px; }
+        .match { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .mismatch { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+        .result-card { padding: 12px; border: 1px solid #334155; border-radius: 8px; margin-bottom: 8px; background: #0f172a; position: relative; }
+        .score-pill { position: absolute; top: 10px; right: 10px; font-size: 0.8em; font-family: monospace; background: #334155; padding: 2px 6px; border-radius: 4px; }
+        .badge { font-size: 0.75em; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; }
+        .tier1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .tier2 { background: #94a3b8; color: #fff; }
+        .model-header { min-width: 220px; border-right: 1px solid #334155; }
+        .bias-bar { height: 6px; border-radius: 3px; background: #334155; margin-top: 4px; overflow: hidden; }
+        .bias-fill { height: 100%; background: #a855f7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1>💒 Matrimony Search Benchmark</h1>
+            <p>Evaluating Embedding Models on Dynamic User Queries</p>
+        </div>
+        
+        <div class="card" style="border: 1px solid #8b5cf6; background: linear-gradient(to right, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));">
+            <h2 style="color: #fff; margin-top: 0;">🏆 Champion: Gemini-001 (1152) (1152d)</h2>
+            <div style="display: flex; gap: 2rem;">
+                <div><span style="color: #94a3b8;">Average nDCG</span><br><strong style="font-size: 1.5em; color: #4ade80;">0.6837</strong></div>
+                <div><span style="color: #94a3b8;">Avg Search Time</span><br><strong style="font-size: 1.5em;">470.2ms</strong></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🧠 Model Behavior & Bias Analysis</h3>
+            <p style="color:#94a3b8; font-size:0.9em;">Analysis of what each model prioritizes (Job, Location, Education) across all queries.</p>
+            <table>
+                <tr>
+                    <th>Model</th>
+                    <th>Job Sensitivity</th>
+                    <th>Loc Sensitivity</th>
+                    <th>Edu Sensitivity</th>
+                </tr>
+    
+        <tr>
+            <td><strong>Text-Embed-004 (768) (768d)</strong></td>
+            <td>60.0%<div class="bias-bar"><div class="bias-fill" style="width:60.0%; background:#22c55e;"></div></div></td>
+            <td>40.0%<div class="bias-bar"><div class="bias-fill" style="width:40.0%; background:#3b82f6;"></div></div></td>
+            <td>40.0%<div class="bias-bar"><div class="bias-fill" style="width:40.0%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+        <tr>
+            <td><strong>Text-Embed-005 (768) (768d)</strong></td>
+            <td>55.0%<div class="bias-bar"><div class="bias-fill" style="width:55.00000000000001%; background:#22c55e;"></div></div></td>
+            <td>45.0%<div class="bias-bar"><div class="bias-fill" style="width:45.0%; background:#3b82f6;"></div></div></td>
+            <td>40.0%<div class="bias-bar"><div class="bias-fill" style="width:40.0%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+        <tr>
+            <td><strong>Gemini-001 (768) (768d)</strong></td>
+            <td>60.0%<div class="bias-bar"><div class="bias-fill" style="width:60.0%; background:#22c55e;"></div></div></td>
+            <td>45.0%<div class="bias-bar"><div class="bias-fill" style="width:45.0%; background:#3b82f6;"></div></div></td>
+            <td>55.0%<div class="bias-bar"><div class="bias-fill" style="width:55.00000000000001%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+        <tr>
+            <td><strong>Gemini-001 (1152) (1152d)</strong></td>
+            <td>65.0%<div class="bias-bar"><div class="bias-fill" style="width:65.0%; background:#22c55e;"></div></div></td>
+            <td>40.0%<div class="bias-bar"><div class="bias-fill" style="width:40.0%; background:#3b82f6;"></div></div></td>
+            <td>55.0%<div class="bias-bar"><div class="bias-fill" style="width:55.00000000000001%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+        <tr>
+            <td><strong>Gemini-001 (1536) (1536d)</strong></td>
+            <td>60.0%<div class="bias-bar"><div class="bias-fill" style="width:60.0%; background:#22c55e;"></div></div></td>
+            <td>45.0%<div class="bias-bar"><div class="bias-fill" style="width:45.0%; background:#3b82f6;"></div></div></td>
+            <td>55.0%<div class="bias-bar"><div class="bias-fill" style="width:55.00000000000001%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+        <tr>
+            <td><strong>Gemini-001 (3072) (3072d)</strong></td>
+            <td>60.0%<div class="bias-bar"><div class="bias-fill" style="width:60.0%; background:#22c55e;"></div></div></td>
+            <td>45.0%<div class="bias-bar"><div class="bias-fill" style="width:45.0%; background:#3b82f6;"></div></div></td>
+            <td>55.0%<div class="bias-bar"><div class="bias-fill" style="width:55.00000000000001%; background:#f59e0b;"></div></div></td>
+        </tr>
+        
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>📊 Performance Summary</h3>
+            <table>
+                <tr><th>Model</th><th>Dim</th><th>nDCG</th><th>Latency</th></tr>
+    <tr><td><strong>Gemini-001 (1152)</strong></td><td>1152</td><td>0.6837</td><td>50.4ms / 470.2ms</td></tr><tr><td><strong>Gemini-001 (768)</strong></td><td>768</td><td>0.6837</td><td>52.0ms / 641.9ms</td></tr><tr><td><strong>Gemini-001 (1536)</strong></td><td>1536</td><td>0.6837</td><td>43.6ms / 404.9ms</td></tr><tr><td><strong>Gemini-001 (3072)</strong></td><td>3072</td><td>0.6837</td><td>57.2ms / 528.8ms</td></tr><tr><td><strong>Text-Embed-005 (768)</strong></td><td>768</td><td>0.6585</td><td>34.5ms / 935.5ms</td></tr><tr><td><strong>Text-Embed-004 (768)</strong></td><td>768</td><td>0.6328</td><td>57.0ms / 654.3ms</td></tr></table></div>
+        <div class="card">
+            <h3 style="margin-bottom:0.5rem;">🔍 <span style="font-weight: normal; color: #94a3b8;">SDE (Prof + Edu):</span> <span style="color:#fff">"Looking for a SDE who has done B.Tech."</span></h3>
+            
+            <div style="margin-bottom: 1.5rem; background: #2e1065; padding: 1rem; border-radius: 8px; border-left: 5px solid #a855f7;">
+                <h4 style="margin-top:0; color:#a855f7; margin-bottom:0.5rem;">🎯 Expected Ideal Matches (Tier 1):</h4>
+                <div style='display:flex; flex-wrap:wrap; gap:10px;'><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Arjun</strong> <small>(SDE, Ahmedabad)</small></div><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Nisha</strong> <small>(SDE, Bangalore)</small></div><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Varun</strong> <small>(SDE, Hyderabad)</small></div></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+            <table><thead><tr>
+        <th class='model-header'>Text-Embed-004 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.833</span></th><th class='model-header'>Text-Embed-005 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.833</span></th><th class='model-header'>Gemini-001 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.904</span></th><th class='model-header'>Gemini-001 (1152) (1152d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.904</span></th><th class='model-header'>Gemini-001 (1536) (1536d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.904</span></th><th class='model-header'>Gemini-001 (3072) (3072d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.904</span></th></tr></thead><tbody><tr><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.671</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.667</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.663</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.662</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#103 Ishita</strong><br><small>QA Tester • B.Tech • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.631</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.748</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.728</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.715</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.706</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#115 Kartik</strong><br><small>Backend Developer • BE • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.688</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.803</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.800</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.796</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.773</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#97 Shweta</strong><br><small>QA Tester • B.Tech • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.760</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.793</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.789</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.784</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.765</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#97 Shweta</strong><br><small>QA Tester • B.Tech • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.752</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.796</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.791</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.786</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.767</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#97 Shweta</strong><br><small>QA Tester • B.Tech • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.748</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#154 Varun</strong><br><small>SDE • B.Tech Computer Science • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.814</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#7 Arjun</strong><br><small>SDE • B.Tech Computer Science • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.809</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#60 Nisha</strong><br><small>SDE • B.E. CSE • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.805</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.787</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#97 Shweta</strong><br><small>QA Tester • B.Tech • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.772</span>
+                </div>
+                </td></tr></tbody></table></div></div>
+        <div class="card">
+            <h3 style="margin-bottom:0.5rem;">🔍 <span style="font-weight: normal; color: #94a3b8;">Radiologist (Prof + Loc):</span> <span style="color:#fff">"Looking for a Radiologist and lives in Ahmedabad."</span></h3>
+            
+            <div style="margin-bottom: 1.5rem; background: #2e1065; padding: 1rem; border-radius: 8px; border-left: 5px solid #a855f7;">
+                <h4 style="margin-top:0; color:#a855f7; margin-bottom:0.5rem;">🎯 Expected Ideal Matches (Tier 1):</h4>
+                <div style='display:flex; flex-wrap:wrap; gap:10px;'><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Mohit</strong> <small>(Radiologist, Ahmedabad)</small></div><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Sahil</strong> <small>(Radiologist, Ahmedabad)</small></div></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+            <table><thead><tr>
+        <th class='model-header'>Text-Embed-004 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Text-Embed-005 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.753</span></th><th class='model-header'>Gemini-001 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.783</span></th><th class='model-header'>Gemini-001 (1152) (1152d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.783</span></th><th class='model-header'>Gemini-001 (1536) (1536d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.783</span></th><th class='model-header'>Gemini-001 (3072) (3072d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.783</span></th></tr></thead><tbody><tr><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.759</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.759</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#96 Divya</strong><br><small>Radiologist • DNB Radiology • Pune</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.693</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#152 Ishaan</strong><br><small>Radiologist • DNB Radiology • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.690</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#74 Siddharth</strong><br><small>Radiologist • DNB Radiology • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.690</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.770</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.770</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#152 Ishaan</strong><br><small>Radiologist • DNB Radiology • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.697</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#74 Siddharth</strong><br><small>Radiologist • DNB Radiology • Hyderabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.697</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#15 Radhika</strong><br><small>Medical Officer • MBBS • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.690</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.814</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.814</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#15 Radhika</strong><br><small>Medical Officer • MBBS • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.741</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#96 Divya</strong><br><small>Radiologist • DNB Radiology • Pune</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.730</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#120 Divya</strong><br><small>Radiologist • DNB Radiology • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.725</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.807</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.807</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#15 Radhika</strong><br><small>Medical Officer • MBBS • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.730</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#96 Divya</strong><br><small>Radiologist • DNB Radiology • Pune</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.727</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#120 Divya</strong><br><small>Radiologist • DNB Radiology • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.721</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.810</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.810</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#15 Radhika</strong><br><small>Medical Officer • MBBS • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.730</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#96 Divya</strong><br><small>Radiologist • DNB Radiology • Pune</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.728</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#120 Divya</strong><br><small>Radiologist • DNB Radiology • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.727</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#49 Sahil</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.825</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#9 Mohit</strong><br><small>Radiologist • MD Radiology • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.825</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier2'>🥈 Tier 2</span><br>
+                    <strong>#15 Radhika</strong><br><small>Medical Officer • MBBS • Ahmedabad</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span></div>
+                    <span class="score-pill">Sim: 0.751</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#96 Divya</strong><br><small>Radiologist • DNB Radiology • Pune</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.749</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#120 Divya</strong><br><small>Radiologist • DNB Radiology • Bangalore</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span></div>
+                    <span class="score-pill">Sim: 0.749</span>
+                </div>
+                </td></tr></tbody></table></div></div>
+        <div class="card">
+            <h3 style="margin-bottom:0.5rem;">🔍 <span style="font-weight: normal; color: #94a3b8;">CA (Edu + Loc):</span> <span style="color:#fff">"Looking for a Someone who has done CA and lives in Delhi."</span></h3>
+            
+            <div style="margin-bottom: 1.5rem; background: #2e1065; padding: 1rem; border-radius: 8px; border-left: 5px solid #a855f7;">
+                <h4 style="margin-top:0; color:#a855f7; margin-bottom:0.5rem;">🎯 Expected Ideal Matches (Tier 1):</h4>
+                <div style='display:flex; flex-wrap:wrap; gap:10px;'><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Amrita</strong> <small>(Finance Manager, Delhi)</small></div><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Aavya</strong> <small>(DevOps Engineer, Delhi)</small></div></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+            <table><thead><tr>
+        <th class='model-header'>Text-Embed-004 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th><th class='model-header'>Text-Embed-005 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th><th class='model-header'>Gemini-001 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th><th class='model-header'>Gemini-001 (1152) (1152d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th><th class='model-header'>Gemini-001 (1536) (1536d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th><th class='model-header'>Gemini-001 (3072) (3072d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.399</span></th></tr></thead><tbody><tr><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.743</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.703</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.700</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#156 Vanshika</strong><br><small>Chartered Accountant • B.Com • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.693</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#139 Ritesh</strong><br><small>Chartered Accountant • B.Com • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.693</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.744</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.704</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.698</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#167 Suresh</strong><br><small>Finance Manager • CA • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.686</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#48 Ishani</strong><br><small>Business Analyst • B.Com • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.680</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.793</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.758</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.746</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#77 Saanvi</strong><br><small>Marketing Head • CFA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.745</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#167 Suresh</strong><br><small>Finance Manager • CA • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.733</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.778</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.744</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.730</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#77 Saanvi</strong><br><small>Marketing Head • CFA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.728</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#167 Suresh</strong><br><small>Finance Manager • CA • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.715</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.782</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.749</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#77 Saanvi</strong><br><small>Marketing Head • CFA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.735</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.734</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#167 Suresh</strong><br><small>Finance Manager • CA • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.721</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#11 Amrita</strong><br><small>Finance Manager • CA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.801</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#54 Aryan</strong><br><small>Investment Banker • CA • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.772</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#77 Saanvi</strong><br><small>Marketing Head • CFA • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.758</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#107 Mohit</strong><br><small>Finance Manager • MBA Finance • Delhi</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.757</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#167 Suresh</strong><br><small>Finance Manager • CA • Mumbai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.745</span>
+                </div>
+                </td></tr></tbody></table></div></div>
+        <div class="card">
+            <h3 style="margin-bottom:0.5rem;">🔍 <span style="font-weight: normal; color: #94a3b8;">Business Analyst (All 3):</span> <span style="color:#fff">"Looking for a Business Analyst who has done MBA and lives in Noida."</span></h3>
+            
+            <div style="margin-bottom: 1.5rem; background: #2e1065; padding: 1rem; border-radius: 8px; border-left: 5px solid #a855f7;">
+                <h4 style="margin-top:0; color:#a855f7; margin-bottom:0.5rem;">🎯 Expected Ideal Matches (Tier 1):</h4>
+                <div style='display:flex; flex-wrap:wrap; gap:10px;'><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Ritesh</strong> <small>(Business Analyst, Noida)</small></div><div style='background:rgba(139, 92, 246, 0.2); border:1px solid #8b5cf6; padding:4px 8px; border-radius:6px; color:#ddd;'><strong>Diya</strong> <small>(Business Analyst, Noida)</small></div></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+            <table><thead><tr>
+        <th class='model-header'>Text-Embed-004 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Text-Embed-005 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Gemini-001 (768) (768d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Gemini-001 (1152) (1152d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Gemini-001 (1536) (1536d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th><th class='model-header'>Gemini-001 (3072) (3072d)<br><span style='font-weight:normal; opacity:0.8'>nDCG: 0.650</span></th></tr></thead><tbody><tr><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.747</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.747</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#48 Ishani</strong><br><small>Business Analyst • B.Com • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.683</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#50 Sahil</strong><br><small>HR Specialist • PGDM HR • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.681</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#118 Sakshi</strong><br><small>Product Manager • BCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.668</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.749</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.749</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#57 Tanvi</strong><br><small>SDE • MCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.691</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#48 Ishani</strong><br><small>Business Analyst • B.Com • Gurgaon</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.687</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#200 Vihaan</strong><br><small>QA Tester • BCA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.687</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.818</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.818</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#144 Vanshika</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.750</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#163 Tushar</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.750</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#180 Raghav</strong><br><small>Investment Banker • CS • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.718</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.811</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.811</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#144 Vanshika</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.739</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#163 Tushar</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.739</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#122 Rishi</strong><br><small>Business Analyst • BBA • Kolkata</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.707</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.814</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.814</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#144 Vanshika</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.742</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#163 Tushar</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.742</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#180 Raghav</strong><br><small>Investment Banker • CS • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.712</span>
+                </div>
+                </td><td style='padding:0.5rem; border-right: 1px solid #334155;'>
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#160 Diya</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.829</span>
+                </div>
+                
+                <div class="result-card">
+                    <span class='badge tier1'>👑 Tier 1</span><br>
+                    <strong>#6 Ritesh</strong><br><small>Business Analyst • MBA • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.829</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#144 Vanshika</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.764</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#163 Tushar</strong><br><small>Business Analyst • MBA • Chennai</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag match'>✅ Job</span> <span class='tag mismatch'>❌ Loc</span> <span class='tag match'>✅ Edu</span></div>
+                    <span class="score-pill">Sim: 0.764</span>
+                </div>
+                
+                <div class="result-card">
+                    <br>
+                    <strong>#180 Raghav</strong><br><small>Investment Banker • CS • Noida</small>
+                    <div style="margin-top:6px; border-top: 1px dashed #334155; padding-top: 4px;"><span class='tag mismatch'>❌ Job</span> <span class='tag match'>✅ Loc</span> <span class='tag mismatch'>❌ Edu</span></div>
+                    <span class="score-pill">Sim: 0.737</span>
+                </div>
+                </td></tr></tbody></table></div></div></div></body></html>

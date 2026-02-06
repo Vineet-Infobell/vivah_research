@@ -1,0 +1,1672 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approach 8: Multi-Vector - Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        
+        h1 { 
+            color: #2d3748; 
+            text-align: center; 
+            margin-bottom: 10px; 
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero-section h2 { 
+            font-size: 4em; 
+            margin-bottom: 10px; 
+            font-weight: bold;
+        }
+        
+        .hero-section p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #8b5cf6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #5b21b6;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .value {
+            color: #6d28d9;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: #6d28d9;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #8b5cf6;
+            padding-bottom: 10px;
+        }
+        
+        .config-box {
+            background: #faf5ff;
+            border: 2px solid #c4b5fd;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .config-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd6fe;
+        }
+        
+        .config-label {
+            color: #5b21b6;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .config-value {
+            color: #6d28d9;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .scenario {
+            background: #fdf4ff;
+            margin-bottom: 40px;
+            border: 2px solid #e9d5ff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .scenario h2 {
+            color: #7c3aed;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .metric {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #e9d5ff;
+            font-weight: 600;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 25px;
+        }
+        
+        .profile-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #d1d5db;
+        }
+        
+        .profile-card.match-yes {
+            border-left-color: #10b981;
+            background-color: #d1fae5;
+        }
+        
+        .profile-card.match-no {
+            border-left-color: #ef4444;
+            background-color: #fee2e2;
+        }
+        
+        .score-pill {
+            display: inline-block;
+            background: #c4b5fd;
+            color: #5b21b6;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .insights-box {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: 2px solid #8b5cf6;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        
+        .insights-box h3 {
+            color: #5b21b6;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .insights-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .insights-box li {
+            padding: 12px 0;
+            border-bottom: 1px solid #ddd6fe;
+            color: #3730a3;
+            line-height: 1.8;
+        }
+        
+        .insights-box li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Approach 8: Multi-Vector with Separate Embeddings</h1>
+        <p class="subtitle">Hard filters (Gender, Religion) → 3 Separate Embeddings (Profession, Education, Location) → Weighted Combination → Top 10</p>
+        
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h2>0.286</h2>
+            <p>Average NDCG Score (Ranking Quality)</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+                5 scenarios tested | Average latency: 3047ms
+            </p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Precision</h3>
+                <div class="value">24.0%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Recall</h3>
+                <div class="value">14.1%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Latency</h3>
+                <div class="value">3047ms</div>
+            </div>
+        </div>
+        
+        <!-- Configuration Section -->
+        <div class="section">
+            <h2 class="section-title">⚙️ Algorithm Configuration</h2>
+            <div class="config-box">
+                <h3 style="margin-bottom: 20px; color: #5b21b6;">Multi-Vector Weighted Approach</h3>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <div class="config-label">Hard Filters</div>
+                        <div class="config-value">Gender, Religion Only</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Profession Weight</div>
+                        <div class="config-value">40%</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Education Weight</div>
+                        <div class="config-value">35%</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Location Weight</div>
+                        <div class="config-value">15%</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Age Weight</div>
+                        <div class="config-value">10%</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Embedding Model</div>
+                        <div class="config-value">gemini-embedding-001</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Vector Dimension</div>
+                        <div class="config-value">1152</div>
+                    </div>
+                </div>
+                <p style="margin-top: 20px; color: #4c1d95; line-height: 1.8;">
+                    <strong>Approach:</strong> This optimized multi-vector method generates separate embeddings with rich context 
+                    for profession, education, and location. Each attribute gets its own vector space and optimized weight. 
+                    Final score: 40% profession + 35% education + 15% location + 10% age (Gaussian). 
+                    Provides fine-grained control over attribute importance.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Performance Charts -->
+        <div class="section">
+            <h2 class="section-title">📊 Performance Metrics</h2>
+            <div class="chart-container">
+                <canvas id="performanceChart" height="80"></canvas>
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h2>Scenario 1: SDE</h2>
+            <p><strong>Filters:</strong> Male, Hindu</p>
+            <p><strong>Location:</strong> Bangalore</p>
+            
+            <div class="metrics">
+                <div class="metric">⏱️ Latency: 4915ms</div>
+                <div class="metric">🎯 NDCG: 0.220</div>
+                <div class="metric">✅ Precision: 10.0%</div>
+                <div class="metric">📊 Recall: 6.7%</div>
+            </div>
+            
+            <div class="comparison">
+                <div>
+                    <h3>✅ Predicted Results (Top 10)</h3>
+    
+                    <div class="profile-card match-yes">
+                        <strong>Rahul (ID: 732)</strong><br>
+                        Software Developer, Bangalore<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7379</span>
+                            <span class="score-pill">Prof: 0.7148</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.714</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Abhishek (ID: 461)</strong><br>
+                        Software Developer, Delhi<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.723</span>
+                            <span class="score-pill">Prof: 0.7148</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5816</span>
+                            <span class="score-pill">Age: 0.7989</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Krishna (ID: 214)</strong><br>
+                        SDE, Delhi<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7218</span>
+                            <span class="score-pill">Prof: 0.752</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5816</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Deepak (ID: 374)</strong><br>
+                        Mechanical Engineer, Bangalore<br>
+                        Age: 27<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.711</span>
+                            <span class="score-pill">Prof: 0.6026</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Mayank (ID: 478)</strong><br>
+                        DevOps Engineer, Chennai<br>
+                        Age: 25<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7105</span>
+                            <span class="score-pill">Prof: 0.6544</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5857</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Mohit (ID: 297)</strong><br>
+                        Software Developer, Kolkata<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7062</span>
+                            <span class="score-pill">Prof: 0.7148</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5768</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Ayaan (ID: 429)</strong><br>
+                        Software Developer, Chennai<br>
+                        Age: 21<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7058</span>
+                            <span class="score-pill">Prof: 0.7148</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5857</span>
+                            <span class="score-pill">Age: 0.621</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Ravi (ID: 548)</strong><br>
+                        Backend Developer, Delhi<br>
+                        Age: 24<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7003</span>
+                            <span class="score-pill">Prof: 0.6512</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5816</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Sahil (ID: 243)</strong><br>
+                        Full Stack Developer, Mumbai<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7002</span>
+                            <span class="score-pill">Prof: 0.6618</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5712</span>
+                            <span class="score-pill">Age: 0.7989</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Rajesh (ID: 308)</strong><br>
+                        Mechanical Engineer, Chennai<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6988</span>
+                            <span class="score-pill">Prof: 0.6026</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5857</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div>
+                    <h3>🎯 Ground Truth (Expected)</h3>
+    
+                    <div class="profile-card match-yes">
+                        <strong>Rahul (ID: 732)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 904)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Abhishek (ID: 908)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Rohan (ID: 901)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Vikram (ID: 906)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Yash (ID: 916)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Deepak (ID: 794)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Pranav (ID: 905)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Varun (ID: 907)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ravi (ID: 902)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Karan (ID: 903)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 912)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Siddharth (ID: 909)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Rahul (ID: 913)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Varun (ID: 245)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    
+        <div class="scenario">
+            <h2>Scenario 2: Doctor</h2>
+            <p><strong>Filters:</strong> Male, Hindu</p>
+            <p><strong>Location:</strong> None</p>
+            
+            <div class="metrics">
+                <div class="metric">⏱️ Latency: 2931ms</div>
+                <div class="metric">🎯 NDCG: 0.589</div>
+                <div class="metric">✅ Precision: 50.0%</div>
+                <div class="metric">📊 Recall: 25.0%</div>
+            </div>
+            
+            <div class="comparison">
+                <div>
+                    <h3>✅ Predicted Results (Top 10)</h3>
+    
+                    <div class="profile-card match-yes">
+                        <strong>Akash (ID: 256)</strong><br>
+                        Doctor, Mumbai<br>
+                        Age: 27<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7305</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.6328</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Vikram (ID: 246)</strong><br>
+                        Doctor, Mumbai<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7195</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.6328</span>
+                            <span class="score-pill">Age: 0.7989</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 299)</strong><br>
+                        Doctor, Gurgaon<br>
+                        Age: 24<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7061</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.621</span>
+                            <span class="score-pill">Age: 0.683</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Pranav (ID: 590)</strong><br>
+                        Doctor, Gurgaon<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7045</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.629</span>
+                            <span class="score-pill">Loc: 0.621</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Ayaan (ID: 100)</strong><br>
+                        Physician, Noida<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6994</span>
+                            <span class="score-pill">Prof: 0.6596</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.6175</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Varun (ID: 219)</strong><br>
+                        Doctor, Gurgaon<br>
+                        Age: 33<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6949</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.621</span>
+                            <span class="score-pill">Age: 0.5704</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Yash (ID: 419)</strong><br>
+                        Physician, Bangalore<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6915</span>
+                            <span class="score-pill">Prof: 0.6596</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.6287</span>
+                            <span class="score-pill">Age: 0.7989</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Arjun (ID: 134)</strong><br>
+                        Doctor, Gurgaon<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6871</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.629</span>
+                            <span class="score-pill">Loc: 0.621</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Vikram (ID: 407)</strong><br>
+                        Doctor, Noida<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6866</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.629</span>
+                            <span class="score-pill">Loc: 0.6175</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Deepak (ID: 455)</strong><br>
+                        Doctor, Kolkata<br>
+                        Age: 35<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6828</span>
+                            <span class="score-pill">Prof: 0.728</span>
+                            <span class="score-pill">Edu: 0.7243</span>
+                            <span class="score-pill">Loc: 0.6171</span>
+                            <span class="score-pill">Age: 0.4557</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div>
+                    <h3>🎯 Ground Truth (Expected)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Sahil (ID: 705)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Aditya (ID: 853)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Mohit (ID: 928)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Vikram (ID: 246)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Pranav (ID: 590)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ravi (ID: 677)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Sanjay (ID: 925)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Varun (ID: 927)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Mayank (ID: 935)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Deepak (ID: 936)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Akash (ID: 256)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Vikram (ID: 922)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Vivek (ID: 923)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Mayank (ID: 924)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Arjun (ID: 134)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Vivek (ID: 178)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Abhishek (ID: 188)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Vikram (ID: 407)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Arjun (ID: 492)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Sahil (ID: 564)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    
+        <div class="scenario">
+            <h2>Scenario 3: Chartered Accountant</h2>
+            <p><strong>Filters:</strong> Male, Hindu</p>
+            <p><strong>Location:</strong> Mumbai</p>
+            
+            <div class="metrics">
+                <div class="metric">⏱️ Latency: 2164ms</div>
+                <div class="metric">🎯 NDCG: 0.044</div>
+                <div class="metric">✅ Precision: 10.0%</div>
+                <div class="metric">📊 Recall: 5.3%</div>
+            </div>
+            
+            <div class="comparison">
+                <div>
+                    <h3>✅ Predicted Results (Top 10)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Mohit (ID: 143)</strong><br>
+                        Chartered Accountant, Noida<br>
+                        Age: 23<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7385</span>
+                            <span class="score-pill">Prof: 0.7641</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.5531</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Abhishek (ID: 306)</strong><br>
+                        Chartered Accountant, Chennai<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7101</span>
+                            <span class="score-pill">Prof: 0.7641</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.5897</span>
+                            <span class="score-pill">Age: 0.5704</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Rohan (ID: 346)</strong><br>
+                        Chartered Accountant, Noida<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7046</span>
+                            <span class="score-pill">Prof: 0.7641</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.5531</span>
+                            <span class="score-pill">Age: 0.5704</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Rahul (ID: 287)</strong><br>
+                        Auditor, Mumbai<br>
+                        Age: 25<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7043</span>
+                            <span class="score-pill">Prof: 0.6185</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.7239</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Aditya (ID: 314)</strong><br>
+                        Investment Banker, Mumbai<br>
+                        Age: 25<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6956</span>
+                            <span class="score-pill">Prof: 0.5966</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.7239</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Pranav (ID: 592)</strong><br>
+                        Investment Banker, Delhi<br>
+                        Age: 25<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6739</span>
+                            <span class="score-pill">Prof: 0.5966</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.579</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 48)</strong><br>
+                        Investment Banker, Bangalore<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6664</span>
+                            <span class="score-pill">Prof: 0.5966</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.5929</span>
+                            <span class="score-pill">Age: 0.7989</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Rahul (ID: 585)</strong><br>
+                        Financial Analyst, Gurgaon<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6583</span>
+                            <span class="score-pill">Prof: 0.6268</span>
+                            <span class="score-pill">Edu: 0.7399</span>
+                            <span class="score-pill">Loc: 0.5653</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Ishaan (ID: 80)</strong><br>
+                        Product Manager, Pune<br>
+                        Age: 24<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6579</span>
+                            <span class="score-pill">Prof: 0.5953</span>
+                            <span class="score-pill">Edu: 0.6615</span>
+                            <span class="score-pill">Loc: 0.5882</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Amit (ID: 720)</strong><br>
+                        Cloud Engineer, Kolkata<br>
+                        Age: 24<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6574</span>
+                            <span class="score-pill">Prof: 0.6132</span>
+                            <span class="score-pill">Edu: 0.643</span>
+                            <span class="score-pill">Loc: 0.5804</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div>
+                    <h3>🎯 Ground Truth (Expected)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Pranav (ID: 943)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Arjun (ID: 944)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ravi (ID: 945)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Mohit (ID: 947)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Rajesh (ID: 955)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ishaan (ID: 948)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Harsh (ID: 942)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ankit (ID: 946)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Rahul (ID: 287)</strong><br>
+                        Relevance: 2<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Suresh (ID: 951)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 956)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ishaan (ID: 941)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Aditya (ID: 864)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Pranav (ID: 949)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ankit (ID: 952)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kartik (ID: 457)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ankit (ID: 653)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Aditya (ID: 799)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Rajesh (ID: 950)</strong><br>
+                        Relevance: 1<br>
+                        ❌ Not Found
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    
+        <div class="scenario">
+            <h2>Scenario 4: UI/UX Designer</h2>
+            <p><strong>Filters:</strong> Female, Hindu</p>
+            <p><strong>Location:</strong> Bangalore</p>
+            
+            <div class="metrics">
+                <div class="metric">⏱️ Latency: 2968ms</div>
+                <div class="metric">🎯 NDCG: 0.577</div>
+                <div class="metric">✅ Precision: 50.0%</div>
+                <div class="metric">📊 Recall: 33.3%</div>
+            </div>
+            
+            <div class="comparison">
+                <div>
+                    <h3>✅ Predicted Results (Top 10)</h3>
+    
+                    <div class="profile-card match-yes">
+                        <strong>Myra (ID: 962)</strong><br>
+                        UI/UX Designer, Bangalore<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7793</span>
+                            <span class="score-pill">Prof: 0.7467</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Sakshi (ID: 961)</strong><br>
+                        UI/UX Designer, Bangalore<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7619</span>
+                            <span class="score-pill">Prof: 0.7467</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Nisha (ID: 972)</strong><br>
+                        UX Researcher, Bangalore<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.724</span>
+                            <span class="score-pill">Prof: 0.6312</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Sakshi (ID: 378)</strong><br>
+                        UI/UX Designer, Pune<br>
+                        Age: 34<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7224</span>
+                            <span class="score-pill">Prof: 0.7467</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.6001</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Pooja (ID: 560)</strong><br>
+                        Full Stack Developer, Bangalore<br>
+                        Age: 31<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7143</span>
+                            <span class="score-pill">Prof: 0.6108</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.8938</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Sakshi (ID: 964)</strong><br>
+                        Product Manager, Bangalore<br>
+                        Age: 29<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7115</span>
+                            <span class="score-pill">Prof: 0.6001</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Megha (ID: 965)</strong><br>
+                        UI/UX Designer, Bangalore<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7108</span>
+                            <span class="score-pill">Prof: 0.7467</span>
+                            <span class="score-pill">Edu: 0.6252</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Vanshika (ID: 866)</strong><br>
+                        Frontend Developer, Kolkata<br>
+                        Age: 30<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7078</span>
+                            <span class="score-pill">Prof: 0.6284</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.5768</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-yes">
+                        <strong>Divya (ID: 975)</strong><br>
+                        UI/UX Designer, Bangalore<br>
+                        Age: 28<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7064</span>
+                            <span class="score-pill">Prof: 0.7467</span>
+                            <span class="score-pill">Edu: 0.6127</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.8265</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Neha (ID: 971)</strong><br>
+                        UX Researcher, Bangalore<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7014</span>
+                            <span class="score-pill">Prof: 0.6312</span>
+                            <span class="score-pill">Edu: 0.7712</span>
+                            <span class="score-pill">Loc: 0.7377</span>
+                            <span class="score-pill">Age: 0.683</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div>
+                    <h3>🎯 Ground Truth (Expected)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Meera (ID: 101)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Diya (ID: 963)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Sakshi (ID: 964)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kavya (ID: 967)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Divya (ID: 968)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kiara (ID: 973)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Sakshi (ID: 961)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Myra (ID: 962)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Megha (ID: 965)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Vanshika (ID: 966)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-yes">
+                        <strong>Divya (ID: 975)</strong><br>
+                        Relevance: 3<br>
+                        ✅ Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Divya (ID: 974)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Simran (ID: 976)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Sakshi (ID: 970)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Aarti (ID: 969)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    
+        <div class="scenario">
+            <h2>Scenario 5: Data Scientist</h2>
+            <p><strong>Filters:</strong> Female, Hindu</p>
+            <p><strong>Location:</strong> Hyderabad</p>
+            
+            <div class="metrics">
+                <div class="metric">⏱️ Latency: 2259ms</div>
+                <div class="metric">🎯 NDCG: 0.000</div>
+                <div class="metric">✅ Precision: 0.0%</div>
+                <div class="metric">📊 Recall: 0.0%</div>
+            </div>
+            
+            <div class="comparison">
+                <div>
+                    <h3>✅ Predicted Results (Top 10)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Aarti (ID: 144)</strong><br>
+                        ML Engineer, Mumbai<br>
+                        Age: 27<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7285</span>
+                            <span class="score-pill">Prof: 0.6599</span>
+                            <span class="score-pill">Edu: 0.7888</span>
+                            <span class="score-pill">Loc: 0.59</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Anjali (ID: 190)</strong><br>
+                        ML Engineer, Bangalore<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7225</span>
+                            <span class="score-pill">Prof: 0.6599</span>
+                            <span class="score-pill">Edu: 0.7888</span>
+                            <span class="score-pill">Loc: 0.6103</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Swati (ID: 851)</strong><br>
+                        Data Scientist, Pune<br>
+                        Age: 31<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.7017</span>
+                            <span class="score-pill">Prof: 0.7458</span>
+                            <span class="score-pill">Edu: 0.7153</span>
+                            <span class="score-pill">Loc: 0.5949</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Aarti (ID: 242)</strong><br>
+                        Cloud Engineer, Pune<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6985</span>
+                            <span class="score-pill">Prof: 0.6056</span>
+                            <span class="score-pill">Edu: 0.7888</span>
+                            <span class="score-pill">Loc: 0.5949</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Vanshika (ID: 280)</strong><br>
+                        ML Engineer, Ahmedabad<br>
+                        Age: 23<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6951</span>
+                            <span class="score-pill">Prof: 0.6599</span>
+                            <span class="score-pill">Edu: 0.7888</span>
+                            <span class="score-pill">Loc: 0.5783</span>
+                            <span class="score-pill">Age: 0.683</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Tara (ID: 770)</strong><br>
+                        Backend Developer, Mumbai<br>
+                        Age: 26<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.694</span>
+                            <span class="score-pill">Prof: 0.5962</span>
+                            <span class="score-pill">Edu: 0.7888</span>
+                            <span class="score-pill">Loc: 0.59</span>
+                            <span class="score-pill">Age: 0.9091</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Tanya (ID: 201)</strong><br>
+                        ML Engineer, Chennai<br>
+                        Age: 27<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6924</span>
+                            <span class="score-pill">Prof: 0.6599</span>
+                            <span class="score-pill">Edu: 0.6809</span>
+                            <span class="score-pill">Loc: 0.6011</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Diya (ID: 312)</strong><br>
+                        Data Scientist, Chennai<br>
+                        Age: 31<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6906</span>
+                            <span class="score-pill">Prof: 0.7458</span>
+                            <span class="score-pill">Edu: 0.6807</span>
+                            <span class="score-pill">Loc: 0.6011</span>
+                            <span class="score-pill">Age: 0.6382</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Aarti (ID: 715)</strong><br>
+                        Data Scientist, Bangalore<br>
+                        Age: 22<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6902</span>
+                            <span class="score-pill">Prof: 0.7458</span>
+                            <span class="score-pill">Edu: 0.6807</span>
+                            <span class="score-pill">Loc: 0.6103</span>
+                            <span class="score-pill">Age: 0.621</span>
+                        </div>
+                    </div>
+        
+                    <div class="profile-card match-no">
+                        <strong>Divya (ID: 672)</strong><br>
+                        ML Engineer, Kolkata<br>
+                        Age: 27<br>
+                        <div style="margin-top:5px;">
+                            <span class="score-pill">Final: 0.6896</span>
+                            <span class="score-pill">Prof: 0.6599</span>
+                            <span class="score-pill">Edu: 0.6809</span>
+                            <span class="score-pill">Loc: 0.5825</span>
+                            <span class="score-pill">Age: 1.0</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div>
+                    <h3>🎯 Ground Truth (Expected)</h3>
+    
+                    <div class="profile-card match-no">
+                        <strong>Aaradhya (ID: 987)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Saanvi (ID: 990)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Pooja (ID: 994)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Simran (ID: 995)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Shruti (ID: 981)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Swati (ID: 982)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ishita (ID: 983)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Preeti (ID: 986)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Sakshi (ID: 985)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Ishita (ID: 989)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Simran (ID: 993)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Kavya (ID: 984)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Sakshi (ID: 988)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Shruti (ID: 996)</strong><br>
+                        Relevance: 3<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Pari (ID: 991)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                    <div class="profile-card match-no">
+                        <strong>Preeti (ID: 992)</strong><br>
+                        Relevance: 2<br>
+                        ❌ Not Found
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    
+        <!-- Key Insights -->
+        <div class="insights-box">
+            <h3>🔑 Key Insights</h3>
+            <ul>
+                <li><strong>Optimized Multi-Vector:</strong> Separate embeddings with rich context for profession (40%), education (35%), location (15%), and age (10%).</li>
+                <li><strong>Rich Query Context:</strong> Enhanced embeddings with descriptive context instead of single words for better semantic matching.</li>
+                <li><strong>Minimal Hard Filters:</strong> Only gender and religion filtered - maximum flexibility for semantic matching.</li>
+                <li><strong>Balanced Weights:</strong> Optimized weights with profession and education getting higher priority, plus age consideration.</li>
+                <li><strong>Performance:</strong> Average NDCG of 0.286 with 24.0% precision in 3047ms.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Performance Chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Scenario 1', 'Scenario 2', 'Scenario 3', 'Scenario 4', 'Scenario 5'],
+                datasets: [
+                    {
+                        label: 'NDCG',
+                        data: [0.22, 0.589, 0.044, 0.577, 0.0],
+                        backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                        borderColor: 'rgba(109, 40, 217, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Precision (%)',
+                        data: [0.1, 0.5, 0.1, 0.5, 0.0],
+                        backgroundColor: 'rgba(196, 181, 253, 0.7)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            callback: function(value) {
+                                return (value * 100).toFixed(0) + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'NDCG vs Precision by Scenario',
+                        font: { size: 16 }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

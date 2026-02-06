@@ -1,0 +1,139 @@
+{
+  "approach": "Approach 5: Minimal Filters + Semantic + Cross-Encoder",
+  "configuration": {
+    "filters": [
+      "gender",
+      "religion"
+    ],
+    "ranking": "pure_cross_encoder"
+  },
+  "summary": {
+    "average_latency_ms": 1352.67,
+    "average_ndcg": 0.709,
+    "average_precision": 42.0,
+    "average_recall": 42.0,
+    "total_scenarios": 5
+  },
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "scenario_name": "Software/IT Professional in Bangalore",
+      "latency_ms": 2873.72,
+      "embedding_time_ms": 2483.75,
+      "db_time_ms": 41.85,
+      "ce_time_ms": 344.86,
+      "ndcg": 0.739,
+      "precision": 40.0,
+      "recall": 40.0,
+      "overlap": 4,
+      "top_10_ids": [
+        732,
+        907,
+        903,
+        904,
+        908,
+        860,
+        297,
+        913,
+        909,
+        507
+      ]
+    },
+    {
+      "scenario_id": 2,
+      "scenario_name": "Medical Professional (Doctor/Surgeon)",
+      "latency_ms": 711.06,
+      "embedding_time_ms": 442.63,
+      "db_time_ms": 48.85,
+      "ce_time_ms": 216.4,
+      "ndcg": 0.458,
+      "precision": 10.0,
+      "recall": 10.0,
+      "overlap": 1,
+      "top_10_ids": [
+        923,
+        783,
+        206,
+        188,
+        571,
+        211,
+        924,
+        246,
+        921,
+        824
+      ]
+    },
+    {
+      "scenario_id": 3,
+      "scenario_name": "Finance Professional in Mumbai",
+      "latency_ms": 1244.63,
+      "embedding_time_ms": 919.22,
+      "db_time_ms": 58.95,
+      "ce_time_ms": 262.75,
+      "ndcg": 0.713,
+      "precision": 50.0,
+      "recall": 50.0,
+      "overlap": 5,
+      "top_10_ids": [
+        943,
+        944,
+        584,
+        655,
+        955,
+        956,
+        946,
+        945,
+        457,
+        952
+      ]
+    },
+    {
+      "scenario_id": 4,
+      "scenario_name": "Designer/PM in Bangalore",
+      "latency_ms": 789.75,
+      "embedding_time_ms": 426.35,
+      "db_time_ms": 56.79,
+      "ce_time_ms": 303.53,
+      "ndcg": 0.779,
+      "precision": 60.0,
+      "recall": 60.0,
+      "overlap": 6,
+      "top_10_ids": [
+        962,
+        961,
+        973,
+        963,
+        964,
+        411,
+        285,
+        477,
+        974,
+        966
+      ]
+    },
+    {
+      "scenario_id": 5,
+      "scenario_name": "Data Scientist in Hyderabad",
+      "latency_ms": 1144.21,
+      "embedding_time_ms": 844.23,
+      "db_time_ms": 53.72,
+      "ce_time_ms": 245.26,
+      "ndcg": 0.857,
+      "precision": 50.0,
+      "recall": 50.0,
+      "overlap": 5,
+      "top_10_ids": [
+        985,
+        986,
+        981,
+        982,
+        993,
+        994,
+        998,
+        997,
+        988,
+        984
+      ]
+    }
+  ]
+}

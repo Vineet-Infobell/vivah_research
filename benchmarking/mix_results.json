@@ -1,0 +1,42 @@
+[
+  {
+    "Model":"Text-Embed-004 (768)",
+    "Dim":768,
+    "Avg nDCG":0.6872194391,
+    "Embed Time (ms)":62.5061953068,
+    "Search Time (ms)":759.9427700043,
+    "Distance":"Cosine"
+  },
+  {
+    "Model":"Gemini-001 (768)",
+    "Dim":768,
+    "Avg nDCG":0.6456973109,
+    "Embed Time (ms)":45.9191441536,
+    "Search Time (ms)":486.9919617971,
+    "Distance":"Cosine"
+  },
+  {
+    "Model":"Gemini-001 (1152)",
+    "Dim":1152,
+    "Avg nDCG":0.6669317394,
+    "Embed Time (ms)":57.0011615753,
+    "Search Time (ms)":416.3444042206,
+    "Distance":"Cosine"
+  },
+  {
+    "Model":"Gemini-001 (1536)",
+    "Dim":1536,
+    "Avg nDCG":0.6577299535,
+    "Embed Time (ms)":43.7999022007,
+    "Search Time (ms)":459.1770966848,
+    "Distance":"Cosine"
+  },
+  {
+    "Model":"Gemini-001 (3072)",
+    "Dim":3072,
+    "Avg nDCG":0.6898558572,
+    "Embed Time (ms)":57.512165308,
+    "Search Time (ms)":407.5003465017,
+    "Distance":"Cosine"
+  }
+]

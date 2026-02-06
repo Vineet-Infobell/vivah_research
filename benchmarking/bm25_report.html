@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BM25 Benchmark Report</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; padding: 2rem; }
+        .header { text-align: center; margin-bottom: 2rem; background: #1e293b; padding: 2rem; border-radius: 12px; }
+        .card { background: #1e293b; margin-bottom: 1rem; padding: 1.5rem; border-radius: 8px; border: 1px solid #334155; }
+        .stats { margin: 10px 0; }
+        .badge { padding: 4px 10px; border-radius: 4px; font-weight: bold; margin-right: 10px; }
+        ul { list-style: none; padding: 0; }
+        li { background: rgba(255,255,255,0.05); padding: 8px; margin: 4px 0; border-radius: 4px; }
+        h3 { color: #a5b4fc; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 BM25 Benchmark Results</h1>
+        <div class="stats">
+            <span class="badge" style="background: #f59e0b; font-size: 1.2rem;">Avg nDCG: 0.4085</span>
+            <span class="badge" style="background: #8b5cf6; font-size: 1.2rem;">Avg MRR: 0.8095</span>
+        </div>
+        <p>Comparison against Semantic Search</p>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Soware Devoper"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.0</span>
+            <span class="badge" style="background: #10b981;">MRR: 0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Data Scientist"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.4201</span>
+            <span class="badge" style="background: #10b981;">MRR: 1.0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Data Scientist</li></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Doctor"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.3985</span>
+            <span class="badge" style="background: #10b981;">MRR: 1.0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Doctor</li></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Dentist"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.4608</span>
+            <span class="badge" style="background: #10b981;">MRR: 1.0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Dentist</li></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Designer"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.8327</span>
+            <span class="badge" style="background: #10b981;">MRR: 0.6667</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Fashion Designer</li><li>UI/UX Designer</li><li>Graphic Designer</li><li>Interior Designer</li></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Lawyer"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.3737</span>
+            <span class="badge" style="background: #10b981;">MRR: 1.0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Corporate Lawyer</li></ul>
+    </div>
+    
+    <div class="card">
+        <h3>Query: "Professor"</h3>
+        <div class="stats">
+            <span class="badge" style="background: #4f46e5;">nDCG: 0.3737</span>
+            <span class="badge" style="background: #10b981;">MRR: 1.0</span>
+        </div>
+        <p><strong>Top 5 Retrieved:</strong></p>
+        <ul><li>Professor</li></ul>
+    </div>
+    
+</body>
+</html>

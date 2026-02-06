@@ -1,0 +1,2474 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matchmaking Report - Approach 2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            color: #333; 
+            padding: 40px 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .hero {
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+        }
+        .hero h1 { 
+            font-size: 3em; 
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .hero .subtitle { font-size: 1.2em; color: #666; margin-bottom: 30px; }
+        .hero .main-metric {
+            font-size: 4em;
+            font-weight: bold;
+            color: #9333ea;
+            margin: 20px 0;
+        }
+        .hero .main-label { font-size: 1.3em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card .value { font-size: 3em; font-weight: bold; color: #9333ea; }
+        .stat-card .label { font-size: 1em; color: #666; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .config-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .config-box h2 {
+            color: #9333ea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .config-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #9333ea;
+        }
+        .config-item .config-label { font-weight: bold; color: #9333ea; margin-bottom: 5px; }
+        .config-item .config-value { font-size: 1.3em; color: #333; }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .chart-container h2 { color: #9333ea; margin-bottom: 20px; }
+        
+        .scenario {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .scenario-header {
+            border-bottom: 3px solid #9333ea;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .scenario-header h2 { color: #9333ea; font-size: 1.8em; margin-bottom: 10px; }
+        
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .metric-card .metric-value { font-size: 2em; font-weight: bold; }
+        .metric-card .metric-label { font-size: 0.9em; opacity: 0.9; margin-top: 5px; }
+        
+        .results-section { margin: 30px 0; }
+        .results-section h3 { 
+            color: #9333ea; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .profile-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            background: #fafafa;
+            transition: all 0.3s;
+        }
+        .profile-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .profile-card.matched { border-color: #9333ea; background: #f3e8ff; }
+        .profile-card.missed { border-color: #ef4444; background: #fef2f2; }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #9333ea;
+        }
+        .profile-id { font-size: 0.85em; color: #888; }
+        .profile-details { color: #555; line-height: 1.6; }
+        .profile-details div { margin: 5px 0; }
+        
+        .score-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .score-pill {
+            background: #9333ea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .match-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .match-badge.found { background: #10b981; color: white; }
+        .match-badge.missed { background: #ef4444; color: white; }
+        
+        .insights-box {
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .insights-box h2 { margin-bottom: 20px; font-size: 2em; }
+        .insights-box ul { list-style: none; padding: 0; }
+        .insights-box li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+        .insights-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>🎯 Approach 2: Hard Filters + Semantic Search</h1>
+        <p class="subtitle">Hard filters on Gender, Religion, Age Range → Pure semantic similarity ranking (Location is semantic)</p>
+        <div class="main-metric">0.955</div>
+        <div class="main-label">Average NDCG Score</div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="value">1203ms</div>
+            <div class="label">Avg Latency</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">76.0%</div>
+            <div class="label">Avg Precision</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">76.0%</div>
+            <div class="label">Avg Recall</div>
+        </div>
+    </div>
+    
+    <div class="config-box">
+        <h2>⚙️ Configuration</h2>
+        <div class="config-grid">
+            <div class="config-item">
+                <div class="config-label">Hard Filters</div>
+                <div class="config-value">Gender, Religion, Age Range</div>
+            </div>
+            <div class="config-item">
+                <div class="config-label">Ranking Method</div>
+                <div class="config-value">Pure Semantic (100%)</div>
+            </div>
+            <div class="config-item">
+                <div class="config-label">Candidates Retrieved</div>
+                <div class="config-value">Top 10</div>
+            </div>
+        </div>
+        <p style="margin-top: 20px; color: #666; line-height: 1.8;">
+            <strong>Approach:</strong> This method applies strict filters (gender, religion, age range), 
+            then ranks candidates using pure semantic similarity based on profession, education, and location. 
+            Location is part of semantic matching, not a hard filter. No age scoring or additional weighting is applied.
+        </p>
+    </div>
+    
+    <div class="chart-container">
+        <h2>📊 Performance Across Scenarios</h2>
+        <canvas id="performanceChart" width="400" height="150"></canvas>
+    </div>
+
+    <div class="scenario">
+        <div class="scenario-header">
+            <h2>Scenario 1: Software/IT Professional in Bangalore</h2>
+            <p><strong>Query:</strong> Looking for Software Developer or SDE with B.Tech and lives in Bangalore</p>
+            <p><strong>Filters:</strong> Male, Hindu, Target Age 29</p>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-value">2605ms</div>
+                <div class="metric-label">Latency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1.000</div>
+                <div class="metric-label">NDCG</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">90.0%</div>
+                <div class="metric-label">Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">90.0%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🔍 Predicted Top 10 Results</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Pranav</span>
+                        <span class="profile-id">ID: 905</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 31 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.783</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Rohan</span>
+                        <span class="profile-id">ID: 901</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.783</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Varun</span>
+                        <span class="profile-id">ID: 907</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 31 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.766</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Rahul</span>
+                        <span class="profile-id">ID: 732</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.766</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Karan</span>
+                        <span class="profile-id">ID: 903</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.766</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Ravi</span>
+                        <span class="profile-id">ID: 902</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 32 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.761</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Vikram</span>
+                        <span class="profile-id">ID: 906</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.761</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Deepak</span>
+                        <span class="profile-id">ID: 794</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Bangalore · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.761</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Kartik</span>
+                        <span class="profile-id">ID: 904</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Abhishek</span>
+                        <span class="profile-id">ID: 908</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🎯 Ground Truth (Top 15 Expected Matches)</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Rahul</span>
+                        <span class="profile-id">ID: 732</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Kartik</span>
+                        <span class="profile-id">ID: 904</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Abhishek</span>
+                        <span class="profile-id">ID: 908</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Rohan</span>
+                        <span class="profile-id">ID: 901</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Vikram</span>
+                        <span class="profile-id">ID: 906</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#6 Yash</span>
+                        <span class="profile-id">ID: 916</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 MCA</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Deepak</span>
+                        <span class="profile-id">ID: 794</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Bangalore · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Pranav</span>
+                        <span class="profile-id">ID: 905</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 31 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Varun</span>
+                        <span class="profile-id">ID: 907</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 31 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Ravi</span>
+                        <span class="profile-id">ID: 902</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 SDE</div>
+                        <div>🎓 B.E.</div>
+                        <div>📍 Bangalore · 32 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#11 Karan</span>
+                        <span class="profile-id">ID: 903</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 26 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#12 Kartik</span>
+                        <span class="profile-id">ID: 912</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 MCA</div>
+                        <div>📍 Bangalore · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#13 Siddharth</span>
+                        <span class="profile-id">ID: 909</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Backend Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#14 Rahul</span>
+                        <span class="profile-id">ID: 913</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Backend Developer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#15 Varun</span>
+                        <span class="profile-id">ID: 245</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Software Developer</div>
+                        <div>🎓 MCA</div>
+                        <div>📍 Bangalore · 34 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="scenario">
+        <div class="scenario-header">
+            <h2>Scenario 2: Medical Professional (Doctor/Surgeon)</h2>
+            <p><strong>Query:</strong> Looking for Doctor or Surgeon with MBBS</p>
+            <p><strong>Filters:</strong> Male, Hindu, Target Age 29</p>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-value">510ms</div>
+                <div class="metric-label">Latency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0.905</div>
+                <div class="metric-label">NDCG</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">50.0%</div>
+                <div class="metric-label">Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">50.0%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🔍 Predicted Top 10 Results</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Abhishek</span>
+                        <span class="profile-id">ID: 188</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.744</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Vivek</span>
+                        <span class="profile-id">ID: 923</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Gurgaon · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.740</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Mayank</span>
+                        <span class="profile-id">ID: 924</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Delhi · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.738</span>
+                    </div>
+                </div>
+
+                <div class="profile-card ">
+                    <div class="profile-header">
+                        <span>#4 Harsh</span>
+                        <span class="profile-id">ID: 871</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Chennai · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.718</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Varun</span>
+                        <span class="profile-id">ID: 927</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Kolkata · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.716</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Vikram</span>
+                        <span class="profile-id">ID: 246</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.710</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Akash</span>
+                        <span class="profile-id">ID: 256</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.710</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Ravi</span>
+                        <span class="profile-id">ID: 677</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Hyderabad · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.708</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Mohit</span>
+                        <span class="profile-id">ID: 928</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Hyderabad · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.708</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Aditya</span>
+                        <span class="profile-id">ID: 853</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Chennai · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.705</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🎯 Ground Truth (Top 15 Expected Matches)</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#1 Sahil</span>
+                        <span class="profile-id">ID: 705</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Ahmedabad · 29 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Aditya</span>
+                        <span class="profile-id">ID: 853</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Chennai · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Mohit</span>
+                        <span class="profile-id">ID: 928</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Hyderabad · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Vikram</span>
+                        <span class="profile-id">ID: 246</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#5 Pranav</span>
+                        <span class="profile-id">ID: 590</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Gurgaon · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Ravi</span>
+                        <span class="profile-id">ID: 677</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Hyderabad · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#7 Sanjay</span>
+                        <span class="profile-id">ID: 925</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Kolkata · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Varun</span>
+                        <span class="profile-id">ID: 927</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Kolkata · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#9 Mayank</span>
+                        <span class="profile-id">ID: 935</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MS (Surgery)</div>
+                        <div>📍 Pune · 30 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#10 Deepak</span>
+                        <span class="profile-id">ID: 936</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MS (Surgery)</div>
+                        <div>📍 Gurgaon · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#11 Akash</span>
+                        <span class="profile-id">ID: 256</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#12 Vikram</span>
+                        <span class="profile-id">ID: 922</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Pune · 27 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#13 Vivek</span>
+                        <span class="profile-id">ID: 923</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Gurgaon · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#14 Mayank</span>
+                        <span class="profile-id">ID: 924</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Delhi · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#15 Arjun</span>
+                        <span class="profile-id">ID: 134</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Gurgaon · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#16 Vivek</span>
+                        <span class="profile-id">ID: 178</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MS (Surgery)</div>
+                        <div>📍 Noida · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#17 Abhishek</span>
+                        <span class="profile-id">ID: 188</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MBBS</div>
+                        <div>📍 Mumbai · 26 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#18 Vikram</span>
+                        <span class="profile-id">ID: 407</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Noida · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#19 Arjun</span>
+                        <span class="profile-id">ID: 492</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Surgeon</div>
+                        <div>🎓 MS (Surgery)</div>
+                        <div>📍 Pune · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#20 Sahil</span>
+                        <span class="profile-id">ID: 564</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Doctor</div>
+                        <div>🎓 MD</div>
+                        <div>📍 Mumbai · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="scenario">
+        <div class="scenario-header">
+            <h2>Scenario 3: Finance Professional in Mumbai</h2>
+            <p><strong>Query:</strong> Looking for Finance Professional (CA / Finance Manager / Analyst / Auditor) and lives in Mumbai</p>
+            <p><strong>Filters:</strong> Male, Hindu, Target Age 27</p>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-value">1186ms</div>
+                <div class="metric-label">Latency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1.000</div>
+                <div class="metric-label">NDCG</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">100.0%</div>
+                <div class="metric-label">Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">100.0%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🔍 Predicted Top 10 Results</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Arjun</span>
+                        <span class="profile-id">ID: 944</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.761</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Pranav</span>
+                        <span class="profile-id">ID: 943</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.761</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Ankit</span>
+                        <span class="profile-id">ID: 946</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.737</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Ravi</span>
+                        <span class="profile-id">ID: 945</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.737</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Rajesh</span>
+                        <span class="profile-id">ID: 955</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 M.Com</div>
+                        <div>📍 Mumbai · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.731</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Rahul</span>
+                        <span class="profile-id">ID: 287</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 25 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.731</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Suresh</span>
+                        <span class="profile-id">ID: 951</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 25 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.731</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Harsh</span>
+                        <span class="profile-id">ID: 942</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.718</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Mohit</span>
+                        <span class="profile-id">ID: 947</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.718</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Ishaan</span>
+                        <span class="profile-id">ID: 948</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.718</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🎯 Ground Truth (Top 15 Expected Matches)</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Pranav</span>
+                        <span class="profile-id">ID: 943</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Arjun</span>
+                        <span class="profile-id">ID: 944</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Ravi</span>
+                        <span class="profile-id">ID: 945</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Mohit</span>
+                        <span class="profile-id">ID: 947</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Rajesh</span>
+                        <span class="profile-id">ID: 955</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 M.Com</div>
+                        <div>📍 Mumbai · 26 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Ishaan</span>
+                        <span class="profile-id">ID: 948</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Harsh</span>
+                        <span class="profile-id">ID: 942</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Ankit</span>
+                        <span class="profile-id">ID: 946</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Rahul</span>
+                        <span class="profile-id">ID: 287</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 25 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Suresh</span>
+                        <span class="profile-id">ID: 951</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 25 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#11 Kartik</span>
+                        <span class="profile-id">ID: 956</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Finance Manager</div>
+                        <div>🎓 M.Com</div>
+                        <div>📍 Mumbai · 31 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#12 Ishaan</span>
+                        <span class="profile-id">ID: 941</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Chartered Accountant</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#13 Aditya</span>
+                        <span class="profile-id">ID: 864</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Financial Analyst</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 23 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#14 Pranav</span>
+                        <span class="profile-id">ID: 949</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Financial Analyst</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 31 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#15 Ankit</span>
+                        <span class="profile-id">ID: 952</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 31 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#16 Kartik</span>
+                        <span class="profile-id">ID: 457</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#17 Ankit</span>
+                        <span class="profile-id">ID: 653</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 M.Com</div>
+                        <div>📍 Mumbai · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#18 Aditya</span>
+                        <span class="profile-id">ID: 799</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Auditor</div>
+                        <div>🎓 CA</div>
+                        <div>📍 Mumbai · 22 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#19 Rajesh</span>
+                        <span class="profile-id">ID: 950</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Financial Analyst</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Mumbai · 32 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 1</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="scenario">
+        <div class="scenario-header">
+            <h2>Scenario 4: Designer/PM in Bangalore</h2>
+            <p><strong>Query:</strong> Looking for UI/UX Designer or Product Manager with B.Tech and lives in Bangalore</p>
+            <p><strong>Filters:</strong> Female, Hindu, Target Age 29</p>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-value">519ms</div>
+                <div class="metric-label">Latency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0.870</div>
+                <div class="metric-label">NDCG</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">70.0%</div>
+                <div class="metric-label">Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">70.0%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🔍 Predicted Top 10 Results</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Sakshi</span>
+                        <span class="profile-id">ID: 961</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.753</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Myra</span>
+                        <span class="profile-id">ID: 962</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.753</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Kiara</span>
+                        <span class="profile-id">ID: 973</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Divya</span>
+                        <span class="profile-id">ID: 974</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Sakshi</span>
+                        <span class="profile-id">ID: 964</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Diya</span>
+                        <span class="profile-id">ID: 963</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.745</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Megha</span>
+                        <span class="profile-id">ID: 965</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.717</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Vanshika</span>
+                        <span class="profile-id">ID: 966</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.717</span>
+                    </div>
+                </div>
+
+                <div class="profile-card ">
+                    <div class="profile-header">
+                        <span>#9 Neha</span>
+                        <span class="profile-id">ID: 971</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UX Researcher</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.715</span>
+                    </div>
+                </div>
+
+                <div class="profile-card ">
+                    <div class="profile-header">
+                        <span>#10 Nisha</span>
+                        <span class="profile-id">ID: 972</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UX Researcher</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.715</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🎯 Ground Truth (Top 15 Expected Matches)</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#1 Meera</span>
+                        <span class="profile-id">ID: 101</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Diya</span>
+                        <span class="profile-id">ID: 963</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Sakshi</span>
+                        <span class="profile-id">ID: 964</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#4 Kavya</span>
+                        <span class="profile-id">ID: 967</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#5 Divya</span>
+                        <span class="profile-id">ID: 968</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 MBA</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Kiara</span>
+                        <span class="profile-id">ID: 973</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 29 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Sakshi</span>
+                        <span class="profile-id">ID: 961</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Myra</span>
+                        <span class="profile-id">ID: 962</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Megha</span>
+                        <span class="profile-id">ID: 965</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Vanshika</span>
+                        <span class="profile-id">ID: 966</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 30 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#11 Divya</span>
+                        <span class="profile-id">ID: 975</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 BFA</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#12 Divya</span>
+                        <span class="profile-id">ID: 974</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Manager</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Bangalore · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#13 Simran</span>
+                        <span class="profile-id">ID: 976</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 UI/UX Designer</div>
+                        <div>🎓 BFA</div>
+                        <div>📍 Bangalore · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#14 Sakshi</span>
+                        <span class="profile-id">ID: 970</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#15 Aarti</span>
+                        <span class="profile-id">ID: 969</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Product Designer</div>
+                        <div>🎓 Bachelor of Design</div>
+                        <div>📍 Bangalore · 26 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="scenario">
+        <div class="scenario-header">
+            <h2>Scenario 5: Data Scientist in Hyderabad</h2>
+            <p><strong>Query:</strong> Looking for Data Scientist with M.Tech and lives in Hyderabad</p>
+            <p><strong>Filters:</strong> Female, Hindu, Target Age 25</p>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-value">1195ms</div>
+                <div class="metric-label">Latency</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1.000</div>
+                <div class="metric-label">NDCG</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">70.0%</div>
+                <div class="metric-label">Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">70.0%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🔍 Predicted Top 10 Results</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Preeti</span>
+                        <span class="profile-id">ID: 986</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.807</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#2 Shruti</span>
+                        <span class="profile-id">ID: 981</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 26 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.807</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Sakshi</span>
+                        <span class="profile-id">ID: 985</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.807</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#4 Swati</span>
+                        <span class="profile-id">ID: 982</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 24 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.807</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Aaradhya</span>
+                        <span class="profile-id">ID: 987</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.780</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Kavya</span>
+                        <span class="profile-id">ID: 984</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.780</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Ishita</span>
+                        <span class="profile-id">ID: 983</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 24 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.780</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Sakshi</span>
+                        <span class="profile-id">ID: 988</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.780</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Simran</span>
+                        <span class="profile-id">ID: 993</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Hyderabad · 27 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.777</span>
+                    </div>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#10 Pooja</span>
+                        <span class="profile-id">ID: 994</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <div class="score-pills">
+                        <span class="score-pill">Semantic: 0.777</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h3>🎯 Ground Truth (Top 15 Expected Matches)</h3>
+            <div class="profile-grid">
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#1 Aaradhya</span>
+                        <span class="profile-id">ID: 987</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#2 Saanvi</span>
+                        <span class="profile-id">ID: 990</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 ML Engineer</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#3 Pooja</span>
+                        <span class="profile-id">ID: 994</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#4 Simran</span>
+                        <span class="profile-id">ID: 995</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 ML Engineer</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 25 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#5 Shruti</span>
+                        <span class="profile-id">ID: 981</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 26 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#6 Swati</span>
+                        <span class="profile-id">ID: 982</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 24 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#7 Ishita</span>
+                        <span class="profile-id">ID: 983</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 24 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#8 Preeti</span>
+                        <span class="profile-id">ID: 986</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 26 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#9 Sakshi</span>
+                        <span class="profile-id">ID: 985</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#10 Ishita</span>
+                        <span class="profile-id">ID: 989</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 ML Engineer</div>
+                        <div>🎓 M.Tech</div>
+                        <div>📍 Hyderabad · 27 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#11 Simran</span>
+                        <span class="profile-id">ID: 993</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 B.Tech</div>
+                        <div>📍 Hyderabad · 27 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#12 Kavya</span>
+                        <span class="profile-id">ID: 984</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card matched">
+                    <div class="profile-header">
+                        <span>#13 Sakshi</span>
+                        <span class="profile-id">ID: 988</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 Data Scientist</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <span class="match-badge found">✓ Found</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#14 Shruti</span>
+                        <span class="profile-id">ID: 996</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 ML Engineer</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 3</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#15 Pari</span>
+                        <span class="profile-id">ID: 991</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 AI Engineer</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 24 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+                <div class="profile-card missed">
+                    <div class="profile-header">
+                        <span>#16 Preeti</span>
+                        <span class="profile-id">ID: 992</span>
+                    </div>
+                    <div class="profile-details">
+                        <div>👔 AI Engineer</div>
+                        <div>🎓 MS in CS</div>
+                        <div>📍 Hyderabad · 28 years</div>
+                    </div>
+                    <span class="match-badge missed">○ Missed</span>
+                    <span class="score-pill" style="margin-left: 8px;">Relevance: 2</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="insights-box">
+        <h2>💡 Key Insights</h2>
+        <ul>
+            <li><strong>Pure Semantic Approach:</strong> 100% semantic similarity ranking without age scoring or additional weights</li>
+            <li><strong>Essential Hard Filters:</strong> Gender, religion, age range - Location is semantic</li>
+            <li><strong>Simplicity:</strong> Straightforward approach - minimal filters + semantic search, easy to understand</li>
+            <li><strong>Performance:</strong> Average NDCG of 0.955 with 76.0% precision in 1203ms</li>
+            <li><strong>Flexibility:</strong> Location matching is flexible through semantic similarity</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const ctx = document.getElementById('performanceChart').getContext('2d');
+const data = {
+    labels: ['S1', 'S2', 'S3', 'S4', 'S5'],
+    datasets: [
+        {
+            label: 'NDCG',
+            data: [np.float64(1.0), np.float64(0.905), np.float64(1.0), np.float64(0.87), np.float64(1.0)],
+            backgroundColor: 'rgba(147, 51, 234, 0.8)',
+            borderColor: 'rgba(147, 51, 234, 1)',
+            borderWidth: 2
+        },
+        {
+            label: 'Precision (%)',
+            data: [0.9, 0.5, 1.0, 0.7, 0.7],
+            backgroundColor: 'rgba(126, 34, 206, 0.8)',
+            borderColor: 'rgba(126, 34, 206, 1)',
+            borderWidth: 2
+        }
+    ]
+};
+
+new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top'
+            },
+            title: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 1.0,
+                ticks: {
+                    callback: function(value) {
+                        return value.toFixed(2);
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

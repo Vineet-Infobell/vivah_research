@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Embedding Benchmark Report</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: #1e293b; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #334155; }
+        h1 { background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: rgba(99,102,241,0.1); padding: 1rem; text-align: left; color: #818cf8; }
+        td { padding: 1rem; border-bottom: 1px solid #334155; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+        .gold { color: #fbbf24; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); }
+        .score { font-family: monospace; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1>🌍 Global Embedding Benchmark</h1>
+            <p style="color: #94a3b8;">Aggregated performance across Profession, Education, and Location domains</p>
+            <p style="color: #64748b; font-size: 0.9em;">Generated: 2026-01-23 16:30:23</p>
+        </div>
+
+        <div class="card" style="background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%); border: 1px solid #6366f1;">
+            <h2 style="color: #818cf8; margin-bottom: 1rem;">🏆 Top Performer: The "All-Rounder"</h2>
+            <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                <div>
+                    <span style="display: block; font-size: 0.9em; color: #94a3b8;">MODEL</span>
+                    <strong style="font-size: 1.5em;">Text-Embed-005 (768)</strong>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.9em; color: #94a3b8;">DIMENSION</span>
+                    <strong style="font-size: 1.5em;">768</strong>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.9em; color: #94a3b8;">DISTANCE</span>
+                    <strong style="font-size: 1.5em;">Cosine</strong>
+                </div>
+                <div style="margin-left: auto; text-align: right;">
+                    <span style="display: block; font-size: 0.9em; color: #94a3b8;">GLOBAL nDCG</span>
+                    <strong style="font-size: 2.5em; color: #4ade80;">0.8828</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Global Leaderboard</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Model</th>
+                        <th>Dim</th>
+                        <th>Distance</th>
+                        <th>Global Score (nDCG)</th>
+                        <th>Consistency (Min-Max)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    
+                    <tr>
+                        <td>🥇</td>
+                        <td><strong>Text-Embed-005 (768)</strong></td>
+                        <td>768</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #4ade80">0.8828</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7925 - 0.9287</td>
+                    </tr>
+        
+                    <tr>
+                        <td>🥈</td>
+                        <td><strong>Text-Embed-005 (768)</strong></td>
+                        <td>768</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #4ade80">0.8828</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7925 - 0.9287</td>
+                    </tr>
+        
+                    <tr>
+                        <td>🥉</td>
+                        <td><strong>Text-Embed-005 (768)</strong></td>
+                        <td>768</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #4ade80">0.8828</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7925 - 0.9287</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#4</td>
+                        <td><strong>Text-Embed-005 (768)</strong></td>
+                        <td>768</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #4ade80">0.8724</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7682 - 0.9438</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#5</td>
+                        <td><strong>Text-Embed-004 (768)</strong></td>
+                        <td>768</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #4ade80">0.8500</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7703 - 0.9286</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#6</td>
+                        <td><strong>Text-Embed-004 (768)</strong></td>
+                        <td>768</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #4ade80">0.8427</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7495 - 0.9390</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#7</td>
+                        <td><strong>Text-Embed-004 (768)</strong></td>
+                        <td>768</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #4ade80">0.8427</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7495 - 0.9390</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#8</td>
+                        <td><strong>Text-Embed-004 (768)</strong></td>
+                        <td>768</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #4ade80">0.8427</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7495 - 0.9390</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#9</td>
+                        <td><strong>Gemini-001 (1152)</strong></td>
+                        <td>1152</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #fbbf24">0.7968</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7004 - 0.9463</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#10</td>
+                        <td><strong>Gemini-001 (1536)</strong></td>
+                        <td>1536</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #fbbf24">0.7962</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7245 - 0.9371</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#11</td>
+                        <td><strong>Gemini-001 (1536)</strong></td>
+                        <td>1536</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #fbbf24">0.7858</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6970 - 0.9371</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#12</td>
+                        <td><strong>Gemini-001 (768)</strong></td>
+                        <td>768</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #fbbf24">0.7842</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6916 - 0.9559</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#13</td>
+                        <td><strong>Gemini-001 (768)</strong></td>
+                        <td>768</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #fbbf24">0.7829</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7052 - 0.9202</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#14</td>
+                        <td><strong>Gemini-001 (1536)</strong></td>
+                        <td>1536</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #fbbf24">0.7795</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6970 - 0.9182</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#15</td>
+                        <td><strong>Gemini-001 (768)</strong></td>
+                        <td>768</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #fbbf24">0.7779</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6916 - 0.9368</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#16</td>
+                        <td><strong>Gemini-001 (1536)</strong></td>
+                        <td>1536</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #fbbf24">0.7763</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.7033 - 0.8965</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#17</td>
+                        <td><strong>Gemini-001 (3072)</strong></td>
+                        <td>3072</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #fbbf24">0.7706</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6970 - 0.8878</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#18</td>
+                        <td><strong>Gemini-001 (1152)</strong></td>
+                        <td>1152</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #fbbf24">0.7696</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6916 - 0.9201</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#19</td>
+                        <td><strong>Gemini-001 (3072)</strong></td>
+                        <td>3072</td>
+                        <td>Inner_Product</td>
+                        <td class="score" style="color: #fbbf24">0.7688</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6777 - 0.9371</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#20</td>
+                        <td><strong>Gemini-001 (3072)</strong></td>
+                        <td>3072</td>
+                        <td>Cosine</td>
+                        <td class="score" style="color: #fbbf24">0.7688</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6777 - 0.9371</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#21</td>
+                        <td><strong>Gemini-001 (3072)</strong></td>
+                        <td>3072</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #fbbf24">0.7688</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6777 - 0.9371</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#22</td>
+                        <td><strong>Gemini-001 (1152)</strong></td>
+                        <td>1152</td>
+                        <td>L2</td>
+                        <td class="score" style="color: #fbbf24">0.7633</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6916 - 0.9012</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#23</td>
+                        <td><strong>Gemini-001 (768)</strong></td>
+                        <td>768</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #fbbf24">0.7573</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6418 - 0.9066</td>
+                    </tr>
+        
+                    <tr>
+                        <td>#24</td>
+                        <td><strong>Gemini-001 (1152)</strong></td>
+                        <td>1152</td>
+                        <td>L1</td>
+                        <td class="score" style="color: #fbbf24">0.7567</td>
+                        <td style="color: #94a3b8; font-size: 0.9em;">0.6732 - 0.8881</td>
+                    </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h3>📂 Source Data</h3>
+            <p style="color: #94a3b8;">This report was generated by aggregating benchmark results from:</p>
+            <ul style="color: #cbd5e1; margin-top: 1rem;">
+    <li><strong>Profession:</strong> prof_results.json (preferred) or benchmark_report.html (fallback)</li><li><strong>Education:</strong> edu_results.json (preferred) or edu_benchmark_report.html (fallback)</li><li><strong>Location:</strong> loc_results.json (preferred) or loc_benchmark_report.html (fallback)</li>
+            </ul>
+            <p style="color: #64748b; font-size: 0.85em; margin-top: 1rem;">
+                💡 JSON files are preferred for faster, more reliable data parsing. HTML files are used as fallback.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+    
